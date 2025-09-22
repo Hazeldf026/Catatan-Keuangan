@@ -60,9 +60,11 @@ class CatatanController extends Controller
         // Handle "Lainnya..." option
         $categoryId = $request->input('category_id');
         $customCategory = null;
+        $tipe = $request->input('tipe');
 
-        $lainnya = Category::where('nama', 'Lainnya...')->first();
-        if ($lainnya && (int)$categoryId == (int)$lainnya->id) {
+        $lainnyaCategory = Category::where('nama', 'Lainnya...')->where('tipe', $tipe)->first();
+
+        if ($lainnyaCategory && $categoryId == $lainnyaCategory->id) {
             $customCategory = $request->input('custom_category');
         }
 
@@ -110,9 +112,11 @@ class CatatanController extends Controller
         // Handle "Lainnya..." option
         $categoryId = $request->input('category_id');
         $customCategory = null;
+        $tipe = $request->input('tipe');
 
-        $lainnya = Category::where('nama', 'Lainnya...')->first();
-        if ($lainnya && $categoryId == $lainnya->id) {
+        $lainnyaCategory = Category::where('nama', 'Lainnya...')->where('tipe', $tipe)->first();
+
+        if ($lainnyaCategory && $categoryId == $lainnyaCategory->id) {
             $customCategory = $request->input('custom_category');
         }
 

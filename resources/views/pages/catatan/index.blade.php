@@ -89,10 +89,10 @@
                             <td class="px-6 py-4 text-center">
                                 <div class="flex justify-center space-x-2">
                                     <a href="{{ route('catatan.edit', $catatan) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                                    <form action="{{ route('catatan.destroy', $catatan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus catatan ini?');">
+                                    <form action="{{ route('catatan.destroy', $catatan) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="font-medium text-red-600 dark:text-red-500 hover:underline">Hapus</button>
+                                        <button type="submit" class="font-medium text-red-600 dark:text-red-500 hover:underline" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus</button>
                                     </form>
                                 </div>
                             </td>
