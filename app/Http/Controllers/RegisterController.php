@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendOtpMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class RegisterController extends Controller
 {
@@ -25,14 +27,18 @@ class RegisterController extends Controller
             'password.confirmed' => '*Konfirmasi password tidak sama',
         ]);
 
-        User::create([
+        $otp = rand(100000, 999999);
+
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'verification_code' => $otp,
+            'verification_code_expires_at' => now()->addMinutes(10),
         ]);
 
+        Mail::to($user->email)->send(new SendOtpMail($otp));
 
-
-        return redirect()->route('login')->with('success', 'Akun berhasil dibuat!');
+        return redirect()->route('otp.verification.form')->with(['email' => $user->email]);
     }
 }
