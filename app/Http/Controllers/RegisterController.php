@@ -22,9 +22,16 @@ class RegisterController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ], [
-            'email.unique' => '*Email Sudah Terdaftar',
             'password.min' => '*Password minimal 8 karakter',
             'password.confirmed' => '*Konfirmasi password tidak sama',
+        ]);
+
+        User::where('email', $request->email)->whereNull('email_verified_at')->delete();
+
+        $request->validate([
+            'email' => 'unique:users,email',
+        ], [
+            'email.unique' => '*Email Sudah Terdaftar'
         ]);
 
         $otp = rand(100000, 999999);
