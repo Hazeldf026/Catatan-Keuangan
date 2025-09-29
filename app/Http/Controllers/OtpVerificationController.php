@@ -19,28 +19,36 @@ class OtpVerificationController extends Controller
     {
         $request->validate([
             'otp' => 'required|numeric|digits:6',
+            'email' => 'required|email'
         ]);
 
-        $user = User::where('email', session('email'))->first();
+        $registrationData = session('registration_data');
 
-        if (!$user) {
-            return back()->withErrors(['otp' => 'User not found']);
+        // Cek jika data session tidak ada atau email tidak cocok
+        if (!$registrationData || $registrationData['email'] !== $request->email) {
+            return back()->withErrors(['otp' => 'Sesi pendaftaran tidak valid. Silakan coba daftar kembali.']);
         }
 
-        if ($user->verification_code !== $request->otp) {
-            return back()->withErrors(['otp' => 'Invalid OTP code']);
+        // Cek jika OTP salah
+        if ($registrationData['verification_code'] != $request->otp) {
+            return back()->withErrors(['otp' => 'Kode OTP tidak valid.']);
         }
 
-        if (now()->gt($user->verification_code_expires_at)) {
-            return back()->withErrors(['otp' => 'OTP has expired. Please request a new one.']);
+        // Cek jika OTP sudah kedaluwarsa
+        if (now()->gt($registrationData['verification_code_expires_at'])) {
+            return back()->withErrors(['otp' => 'Kode OTP telah kedaluwarsa. Silakan coba daftar kembali.']);
         }
 
-        // Mark user as verified
-        $user->email_verified_at = now();
-        $user->verification_code = null;
-        $user->verification_code_expires_at = null;
-        $user->save();
+        User::create([
+            'name' => $registrationData['name'],
+            'email' => $registrationData['email'],
+            'password' => $registrationData['password'],
+            'email_verified_at' => now(),
+            'verification_code' => $registrationData['verification_code'],
+            'verification_code_expires_at' => now()->addMinutes(10),
+        ]);
 
+        session()->forget('registration_data');
         session()->forget('email');
 
         return redirect()->route('login')->with('status', 'Your account has been successfully verified. You can now log in.');

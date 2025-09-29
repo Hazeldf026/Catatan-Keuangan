@@ -23,8 +23,8 @@ Route::get('/verify-otp', [OtpVerificationController::class, 'showVerificationFo
 Route::post('/verify-otp', [OtpVerificationController::class, 'verify'])->name('otp.verify');
 
 //Forgot Password
-Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('forgot-password', [ForgotPasswordController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendOtp'])->name('password.email');
 
 // OTP Verification for Password Reset
 Route::get('/verify-password-otp', [ForgotPasswordController::class, 'showOtpForm'])->name('password.otp.form');

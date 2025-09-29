@@ -11,7 +11,7 @@ use Termwind\Components\Raw;
 
 class ForgotPasswordController extends Controller
 {
-    public function showLinkRequestForm() 
+    public function showForgotPasswordForm() 
     {
         return view('pages.forgot-password');
     }

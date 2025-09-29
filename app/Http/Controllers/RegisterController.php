@@ -22,30 +22,25 @@ class RegisterController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ], [
+            'email.unique' => '*Email Sudah Terdaftar',
             'password.min' => '*Password minimal 8 karakter',
             'password.confirmed' => '*Konfirmasi password tidak sama',
         ]);
 
-        User::where('email', $request->email)->whereNull('email_verified_at')->delete();
-
-        $request->validate([
-            'email' => 'unique:users,email',
-        ], [
-            'email.unique' => '*Email Sudah Terdaftar'
-        ]);
-
         $otp = rand(100000, 999999);
 
-        $user = User::create([
+        $registrationData = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'verification_code' => $otp,
             'verification_code_expires_at' => now()->addMinutes(10),
-        ]);
+        ];
 
-        Mail::to($user->email)->send(new SendOtpMail($otp));
+        session(['registration_data' => $registrationData]);
 
-        return redirect()->route('otp.verification.form')->with(['email' => $user->email]);
+        Mail::to($request->email)->send(new SendOtpMail($otp));
+
+        return redirect()->route('otp.verification.form')->with(['email' => $request->email]);
     }
 }
