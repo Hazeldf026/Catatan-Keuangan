@@ -29,39 +29,45 @@ class ForgotPasswordController extends Controller
         // Generate and save OTP
         $otp = rand(100000, 999999);
         $user->verification_code = $otp;
-        $user->verfication_code_expires_at = now()->addMinutes(10);
+        $user->verification_code_expires_at = now()->addMinutes(10);
         $user->save();
 
         // Send OTP email
         Mail::to($user->email)->send(new SendOtpMail($otp));
 
-        return redirect()->action('password.otp.form')->with(['email' => $user->email]);
+        return redirect()->route('password.otp.form')->with(['email' => $user->email]);
     }
 
     public function showOtpForm()
     {
-        if (!session('email')) {
-            return redirect()->route('password.request');
+        $email = old('email', session('email'));
+        if (!$email) {
+            return redirect()->route('password.request')->withErrors(['email' => 'Silakan masukkan email Anda terlebih dahulu.']);
         }
-        return view('pages.auth.verify-password-otp');
+        return view('pages.auth.verify-password-otp', ['email' => $email]);
     }
 
     public function verifyOtp(Request $request)
     {
         $request->validate([
+            'email' => 'required|email',
             'otp' => 'required|numeric|digits:6'
         ]);
 
-        $user = User::where('email', session('email'))->first();
+        $user = User::where('email', $request->email)->first();
 
-        if (!$user || $user-> verificaton_code !== $request->otp || now()->gt($user->verfication_code_exipires_at)) {
-            return back()->withErrors(['otp' => 'Invalid or expired OTP.']);
+        $otpFromRequest = (int) $request->otp;
+
+        if (!$user || (int) $user->verification_code !== $otpFromRequest || now()->gt($user->verification_code_expires_at)) {
+            return back()->withInput()->withErrors(['otp' => 'OTP tidak valid atau telah kedaluwarsa.']);
         }
+
+        $user->verification_code = null;
+        $user->verification_code_expires_at = null;
+        $user->save();
 
         // Clear OTP
         $token = app('auth.password.broker')->createToken($user);
-
-        session()->forget('email');
 
         return redirect()->route('password.reset', ['token' => $token, 'email' => $user->email]);
     }

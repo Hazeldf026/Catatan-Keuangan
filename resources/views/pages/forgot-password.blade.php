@@ -2,45 +2,61 @@
 
 @section('start')
     <section class="bg-gray-50 dark:bg-gray-900">
-        <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+        {{-- Wadah utama untuk menengahkan konten di halaman --}}
+<div class="min-h-screen w-full bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
 
-            {{-- Logo --}}
-            <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                <img class="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo">
-                Flowbite
-            </a>
+        {{-- Pesan Status (misal: "Kami telah mengirimkan link reset password ke email Anda!") --}}
+        @if (session('status'))
+            <div class="mb-4 bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg relative" role="alert">
+                <span class="block sm:inline">{{ session('status') }}</span>
+            </div>
+        @endif
 
-            <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-                <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-
-                    {{-- Title --}}
-                    <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                        Forgot your password?
-                    </h1>
-
-                    @if (session('status'))
-                        <div class="mb-4 font-medium text-sm text-green-600 dark:text-green-400">
-                            {{ session('status') }}
-                        </div>
-                    @endif
-
-                    <form class="space-y-4 md:space-y-6" action="{{ route('password.email') }}" method="POST">
-                        @csrf
-                        {{-- Email --}}
-                        <div>
-                            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
-                            <input type="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" autocomplete="off" required>
-                            {{-- Show Error --}}
-                            @error('email')
-                                <div class="text-red-600 pt-2">{{$message}}</div>
-                            @enderror
-                        </div>
-
-                        {{-- Submit --}}
-                        <button type="submit" class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Email Password Reset </button>
-                    </form>
+        {{-- Kartu Form Utama --}}
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg p-8">
+            <div class="text-left">
+                {{-- Judul --}}
+                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">
+                    Forgot your password
+                </h1>
+                {{-- Teks Instruksi --}}
+                <p class="mt-2 text-gray-500 dark:text-gray-400">
+                    Please enter the email address you'd like your password reset information sent to
+                </p>
+            </div>
+            
+            <form class="mt-8 space-y-6" action="{{ route('password.email') }}" method="POST">
+                @csrf
+                
+                {{-- Input Email --}}
+                <div>
+                    <label for="email" class="block mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Enter email address</label>
+                    <input type="email" name="email" id="email" 
+                            class="block w-full p-2.5 text-sm rounded-lg bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 placeholder-gray-400 text-gray-800 dark:text-white focus:ring-blue-500 focus:border-blue-500" 
+                            placeholder="name@company.com" autocomplete="off" required value="{{ old('email') }}">
+                    
+                    {{-- Pesan Error Validasi --}}
+                    @error('email')
+                        <div class="text-red-600 pt-2 text-sm">{{$message}}</div>
+                    @enderror
                 </div>
+                
+                {{-- Tombol Submit --}}
+                <button type="submit" 
+                        class="w-full text-white bg-slate-800 hover:bg-slate-900 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-3 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Request reset link
+                </button>
+            </form>
+            
+            {{-- Link Kembali ke Login --}}
+            <div class="text-center mt-6">
+                <a href="{{ route('login') }}" class="font-medium text-sm text-blue-600 dark:text-blue-500 hover:underline">
+                    Back to Login
+                </a>
             </div>
         </div>
+    </div>
+</div>
     </section>
 @endsection
