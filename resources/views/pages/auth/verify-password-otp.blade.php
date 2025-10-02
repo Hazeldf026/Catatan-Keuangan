@@ -38,7 +38,7 @@
                         <input type="hidden" name="email" value="{{ $email ?? '' }}">
 
                         {{-- Komponen Input OTP dengan Alpine.js --}}
-                        <div>
+                        <div x-init="$nextTick(() => document.getElementById('otp-input-0').focus())">
                             {{-- Input tersembunyi untuk menampung nilai OTP gabungan --}}
                             <input type="hidden" name="otp" :value="otp.join('')">
 

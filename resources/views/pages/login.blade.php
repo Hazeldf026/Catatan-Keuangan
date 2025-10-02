@@ -76,7 +76,7 @@
                         <a href="{{ route('password.request') }}" class="text-sm font-medium text-blue-600 dark:text-blue-500 hover:underline">Forgot password?</a>
                     </div>
                     <div class="px-4 pb-1 pt-3">
-                        <button class="uppercase block w-full p-3 text-sm rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">Sign in to your account</button>
+                        <button class="block font-medium w-full p-3 text-sm rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">Sign in to your account</button>
                     </div>
                     <div class="text-center mt-5">
                     <p class="text-gray-500 dark:text-gray-400 text-sm">
