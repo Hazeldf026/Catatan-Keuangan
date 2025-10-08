@@ -3,27 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Credix</title>
+    <title>{{ $title ?? 'Credix' }}</title>
     @vite('resources/css/app.css')
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.0/dist/cdn.min.js"></script>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <style>
+    [x-cloak] { display: none !important; }
+    </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900">
+<body 
+    x-data="{ logoutModalOpen: false }" 
+    @open-logout-modal.window="logoutModalOpen = true"
+    class="bg-gray-100 dark:bg-gray-900">
 
     @hasSection('start')
         <div>
+            <x-notifikasi></x-notifikasi>
             @yield('start')
         </div>
         @stack('script')
     @endif
     
     @hasSection('content')
-        <div class="container mx-auto p-4 sm:p-6 lg:p-8 min-h-screen flex items-center justify-center">
+        <div>
             @yield('content')
         </div>
     @endif
 
-
+    <x-logout-popup />
 
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 </body>

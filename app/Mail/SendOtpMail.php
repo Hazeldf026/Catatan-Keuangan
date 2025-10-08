@@ -39,7 +39,7 @@ class SendOtpMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'pages.auth.otp_mail',
+            view: 'mail.otp_mail',
         );
     }
 

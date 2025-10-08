@@ -67,7 +67,7 @@
                     <div class="flex items-center justify-between my-3 mt-5">
                         <div class="flex items-start">
                             <div class="flex items-center h-5">
-                                <input id="remember" type="checkbox" class="w-4 h-4 border rounded bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-3 focus:ring-blue-600">
+                                <input id="remember" name="remember" type="checkbox" class="w-4 h-4 border rounded bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 focus:ring-3 focus:ring-blue-600">
                             </div>
                             <div class="ml-3 text-sm">
                                 <label for="remember" class="text-gray-600 dark:text-gray-300">Remember me</label>

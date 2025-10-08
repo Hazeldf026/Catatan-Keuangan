@@ -13,26 +13,72 @@ class CatatanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //data total pemasukan
-        $totalPemasukan = Catatan::whereHas('category', function($query){
+        // --- AMBIL SEMUA DATA UNTUK KARTU KANAN (TIDAK BERUBAH) ---
+        $totalPemasukan = Catatan::where('user_id', Auth::id())->whereHas('category', function($query){
             $query->where('tipe', 'pemasukan');
         })->sum('jumlah');
 
-        //data total pengeluaran
-        $totalPengeluaran = Catatan::whereHas('category', function($query){
+        $totalPengeluaran = Catatan::where('user_id', Auth::id())->whereHas('category', function($query){
             $query->where('tipe', 'pengeluaran');
         })->sum('jumlah');
 
-        //saldo akhir
         $saldoAkhir = $totalPemasukan - $totalPengeluaran;
 
-        //ambil data transaksi
-        $catatans = Catatan::with('category')->where('user_id', Auth::id())->latest()->paginate(10);
+        // --- LOGIKA BARU UNTUK FILTER DAN SORTING ---
 
-        //kirim semua data ke view
-        return view('pages.catatan.index', compact('catatans', 'saldoAkhir', 'totalPemasukan', 'totalPengeluaran'));
+        // Ambil data kategori untuk dikirim ke view (untuk filter modal)
+        $categories = Category::orderBy('nama')->get();
+
+        // Query dasar untuk catatan transaksi pengguna
+        $query = Catatan::with('category')->where('user_id', Auth::id());
+
+        // 1. Filter Berdasarkan Rentang Waktu Cepat (3 hari, 5 hari, dll.)
+        if ($request->has('range')) {
+            switch ($request->range) {
+                case '3d': $query->whereDate('created_at', '>=', now()->subDays(3)); break;
+                case '5d': $query->whereDate('created_at', '>=', now()->subDays(5)); break;
+                case 'week': $query->whereDate('created_at', '>=', now()->startOfWeek()); break;
+                case 'month': $query->whereDate('created_at', '>=', now()->startOfMonth()); break;
+                case 'year': $query->whereDate('created_at', '>=', now()->startOfYear()); break;
+            }
+        }
+
+        // 2. Filter dari Modal (Tipe & Kategori)
+        if ($request->has('tipe') && in_array($request->tipe, ['pemasukan', 'pengeluaran'])) {
+            $query->whereHas('category', function($q) use ($request) {
+                $q->where('tipe', $request->tipe);
+            });
+        }
+
+        if ($request->has('kategori') && is_array($request->kategori)) {
+            // Ambil ID kategori berdasarkan nama yang dipilih
+            $categoryIds = Category::whereIn('nama', $request->kategori)->pluck('id');
+            $query->whereIn('category_id', $categoryIds);
+        }
+        
+        // 3. Logika untuk Mengurutkan (Sorting)
+        $sortBy = $request->get('sort_by', 'created_at'); // Default urutkan berdasarkan tanggal
+        $order = $request->get('order', 'desc'); // Default urutan terbaru/terbesar
+
+        if ($sortBy == 'tanggal') {
+            $query->orderBy('created_at', $order);
+        } elseif ($sortBy == 'jumlah') {
+            $query->orderBy('jumlah', $order);
+        }
+
+        // Ambil data transaksi dengan paginasi dan pastikan parameter filter tetap ada saat pindah halaman
+        $catatans = $query->latest()->paginate(6)->withQueryString();
+
+        // Kirim semua data ke view
+        return view('pages.catatan.index', compact(
+            'catatans', 
+            'saldoAkhir', 
+            'totalPemasukan', 
+            'totalPengeluaran',
+            'categories' // Kirim data kategori ke view
+        ));
     }
 
     /**

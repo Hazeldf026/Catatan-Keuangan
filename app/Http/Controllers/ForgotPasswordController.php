@@ -71,4 +71,31 @@ class ForgotPasswordController extends Controller
 
         return redirect()->route('password.reset', ['token' => $token, 'email' => $user->email]);
     }
+
+    public function resendOtp(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return redirect()->route('password.otp.form')
+                ->with(['email' => $request->email])
+                ->withErrors(['otp' => 'We can\'t find a user with that email address.']);
+        }
+
+        // Generate and save OTP
+        $otp = rand(100000, 999999);
+        $user->verification_code = $otp;
+        $user->verification_code_expires_at = now()->addMinutes(10);
+        $user->save();
+
+        // Send OTP email
+        Mail::to($user->email)->send(new SendOtpMail($otp));
+
+        return redirect()->route('password.otp.form')
+            ->with(['email' => $user->email])
+            ->with('success', 'Kode OTP baru telah dikirim ulang ke email Anda.')
+            ->with('otp_resent', true);
+    }
 }

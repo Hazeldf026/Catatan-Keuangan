@@ -55,12 +55,21 @@
 
     {{-- Jumlah --}}
     <div class="mb-5">
-        <label for="jumlah" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah (Rp)</label>
-        <input type="number" id="jumlah" name="jumlah" value="{{ old('jumlah', $catatan->jumlah ?? '') }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="15000" required>
-        @error('jumlah')
-            <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
-        @enderror
-    </div>
+    <label for="jumlah_display" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jumlah (Rp)</label>
+    
+    {{-- Input yang Dilihat Pengguna (untuk display) --}}
+    <input type="text" id="jumlah_display" 
+            value="{{ old('jumlah', isset($catatan) ? number_format($catatan->jumlah, 0, ',', '.') : '') }}"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" 
+            placeholder="15.000" required>
+    
+    {{-- Input Tersembunyi (untuk dikirim ke server) --}}
+    <input type="hidden" name="jumlah" id="jumlah" value="{{ old('jumlah', $catatan->jumlah ?? '') }}">
+
+    @error('jumlah')
+        <p class="mt-2 text-sm text-red-600 dark:text-red-500">{{ $message }}</p>
+    @enderror
+</div>
 
     {{-- Deskripsi --}}
         <div class="mb-5">
@@ -78,6 +87,51 @@
         </button>
     </div>
 </form>
+
+<script>
+    // Ambil elemen input
+    const jumlahDisplay = document.getElementById('jumlah_display');
+    const jumlahHidden = document.getElementById('jumlah');
+
+    // Fungsi untuk memformat angka
+    function formatNumber(number) {
+        // Hapus semua karakter selain digit
+        let cleanNumber = number.toString().replace(/[^0-9]/g, '');
+        // Format dengan pemisah ribuan (titik)
+        return new Intl.NumberFormat('id-ID').format(cleanNumber || 0);
+    }
+
+    // Event listener saat pengguna mengetik
+    jumlahDisplay.addEventListener('input', function(e) {
+        // Ambil nilai mentah dari input display
+        let rawValue = e.target.value;
+        // Hapus semua pemisah untuk disimpan di input hidden
+        let cleanValue = rawValue.replace(/[^0-9]/g, '');
+        
+        // Update nilai input hidden
+        jumlahHidden.value = cleanValue;
+        
+        // Update nilai input display dengan format baru
+        // Simpan posisi kursor sebelum memformat
+        let cursorPosition = e.target.selectionStart;
+        e.target.value = formatNumber(rawValue);
+        
+        // Kembalikan posisi kursor agar tidak loncat ke akhir
+        // Ini adalah trik agar user experience tetap nyaman
+        let newLength = e.target.value.length;
+        let oldLength = rawValue.length;
+        if (newLength > oldLength) {
+            e.target.setSelectionRange(cursorPosition + (newLength - oldLength), cursorPosition + (newLength - oldLength));
+        } else {
+            e.target.setSelectionRange(cursorPosition, cursorPosition);
+        }
+    });
+
+    // Inisialisasi format saat halaman dimuat (untuk mode edit)
+    if (jumlahDisplay.value) {
+        jumlahDisplay.value = formatNumber(jumlahDisplay.value);
+    }
+</script>
 
 <script>
     const tipeSelect = document.getElementById('tipe');

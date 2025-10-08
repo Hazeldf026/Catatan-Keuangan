@@ -64,6 +64,27 @@
                             </button>
                         </div>
                     </form>
+
+                    {{-- Tombol Kirim Ulang dengan Timer --}}
+                    <div x-data="resendTimer()" x-init="init()" class="text-center text-sm mt-5">
+                        <div x-show="!timerRunning">
+                            <span class="text-gray-600 dark:text-gray-400">Tidak menerima kode?</span>
+                            <form action="{{ route('otp.resend') }}" method="POST" class="inline">
+                                @csrf
+                                <input type="hidden" name="email" value="{{ $email }}">
+                                <button type="submit"
+                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                    Kirim ulang
+                                </button>
+                            </form>
+                        </div>
+                        <div x-show="timerRunning" x-cloak>
+                            <p class="text-gray-600 dark:text-gray-400">
+                                Kirim ulang kode dalam <span class="font-bold" x-text="countdown"></span> detik
+                            </p>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -107,5 +128,29 @@
             }
         }
     }
+
+    function resendTimer() {
+            return {
+                timerRunning: false,
+                countdown: 60,
+                init() {
+                    @if (session('otp_resent'))
+                        this.startTimer();
+                    @endif
+                },
+                startTimer() {
+                    this.timerRunning = true;
+                    const timer = setInterval(() => {
+                        if (this.countdown > 0) {
+                            this.countdown--;
+                        } else {
+                            clearInterval(timer);
+                            this.timerRunning = false;
+                            this.countdown = 60; // Reset untuk kirim ulang berikutnya
+                        }
+                    }, 1000);
+                }
+            }
+        }
 </script>
 @endpush
