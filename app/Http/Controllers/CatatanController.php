@@ -39,8 +39,8 @@ class CatatanController extends Controller
             switch ($request->range) {
                 case '3d': $query->whereDate('created_at', '>=', now()->subDays(3)); break;
                 case '5d': $query->whereDate('created_at', '>=', now()->subDays(5)); break;
-                case 'week': $query->whereDate('created_at', '>=', now()->startOfWeek()); break;
-                case 'month': $query->whereDate('created_at', '>=', now()->startOfMonth()); break;
+                case 'week': $query->whereDate('created_at', '>=', now()->subDays(7)); break;
+                case 'month': $query->whereDate('created_at', '>=', now()->subDays(30)); break;
                 case 'year': $query->whereDate('created_at', '>=', now()->startOfYear()); break;
             }
         }
@@ -69,7 +69,7 @@ class CatatanController extends Controller
         }
 
         // Ambil data transaksi dengan paginasi dan pastikan parameter filter tetap ada saat pindah halaman
-        $catatans = $query->latest()->paginate(6)->withQueryString();
+        $catatans = $query->latest()->paginate(10)->withQueryString();
 
         // Kirim semua data ke view
         return view('pages.catatan.index', compact(
