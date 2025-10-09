@@ -1,0 +1,179 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Catatan;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class AnalysisController extends Controller
+{
+    public function showAnalysisPage()
+    {
+        return view('pages.analysis');
+    }
+
+    public function getChartData(Request $request)
+    {
+        $userId = Auth::id();
+        $scale = $request->input('scale', 'monthly');
+
+        // =================================================================
+        // BAGIAN 1: PERHITUNGAN DATA SEUMUR HIDUP (LIFETIME)
+        // Data ini untuk: Kartu Atas, Chart Pie, dan 15 Poin Analisis.
+        // =================================================================
+        
+        $lifetimePemasukanQuery = Catatan::where('user_id', $userId)
+            ->whereHas('category', fn($q) => $q->where('tipe', 'pemasukan'));
+
+        $lifetimePengeluaranQuery = Catatan::where('user_id', $userId)
+            ->whereHas('category', fn($q) => $q->where('tipe', 'pengeluaran'));
+
+        $totalPemasukanLifetime = (clone $lifetimePemasukanQuery)->sum('jumlah');
+        $totalPengeluaranLifetime = (clone $lifetimePengeluaranQuery)->sum('jumlah');
+        $saldoLifetime = $totalPemasukanLifetime - $totalPengeluaranLifetime;
+
+        // Ambil semua transaksi lifetime untuk 15 poin analisis
+        $incomesLifetime = (clone $lifetimePemasukanQuery)->get();
+        $expensesLifetime = (clone $lifetimePengeluaranQuery)->get();
+
+        // Untuk perbandingan, kita hitung periode "bulan lalu" dari sekarang
+        $prevMonthStartDate = Carbon::now()->subMonth()->startOfMonth();
+        $prevMonthEndDate = Carbon::now()->subMonth()->endOfMonth();
+        $lastPeriodIncomes = (clone $lifetimePemasukanQuery)->whereBetween('created_at', [$prevMonthStartDate, $prevMonthEndDate])->sum('jumlah');
+        $lastPeriodExpenses = (clone $lifetimePengeluaranQuery)->whereBetween('created_at', [$prevMonthStartDate, $prevMonthEndDate])->sum('jumlah');
+        
+        // Asumsi periode untuk data harian adalah total hari sejak transaksi pertama
+        $firstTransactionDate = Catatan::where('user_id', $userId)->min('created_at');
+        $daysInPeriodLifetime = $firstTransactionDate ? Carbon::parse($firstTransactionDate)->diffInDays(Carbon::now()) + 1 : 1;
+        
+        $analysisData = $this->calculateAnalysisData($totalPemasukanLifetime, $totalPengeluaranLifetime, $incomesLifetime, $expensesLifetime, $lastPeriodIncomes, $lastPeriodExpenses, $daysInPeriodLifetime);
+
+
+        // =================================================================
+        // BAGIAN 2: PERHITUNGAN DATA PERIODE (SCALED)
+        // Data ini HANYA untuk Chart Batang.
+        // =================================================================
+        [$startDate, $endDate] = $this->getDateRangesForBarChart($scale);
+
+        $catatansPeriode = Catatan::where('user_id', $userId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('created_at')
+            ->get();
+            
+        $barChartData = [];
+        $barChartLabels = [];
+        $groupedCatatans = $catatansPeriode->groupBy(fn($item) => Carbon::parse($item->created_at)->format('d M'));
+
+        foreach ($groupedCatatans as $date => $transactions) {
+            $dailyBalance = 0;
+            foreach ($transactions as $transaction) {
+                if ($transaction->category && $transaction->category->tipe == 'pemasukan') {
+                    $dailyBalance += $transaction->jumlah;
+                } else {
+                    $dailyBalance -= $transaction->jumlah;
+                }
+            }
+            $barChartLabels[] = $date;
+            $barChartData[] = $dailyBalance;
+        }
+
+
+        // =================================================================
+        // BAGIAN 3: MENGIRIM SEMUA DATA DALAM FORMAT JSON
+        // =================================================================
+        return response()->json([
+            // Data Lifetime untuk semua komponen KECUALI chart batang
+            'lifetimeData' => [
+                'summary' => [
+                    'totalPemasukan' => number_format($totalPemasukanLifetime, 0, ',', '.'),
+                    'totalPengeluaran' => number_format($totalPengeluaranLifetime, 0, ',', '.'),
+                    'saldo' => number_format($saldoLifetime, 0, ',', '.'),
+                ],
+                'pieChart' => [
+                    'pemasukan' => $totalPemasukanLifetime,
+                    'pengeluaran' => $totalPengeluaranLifetime,
+                ],
+                'analysisData' => $analysisData,
+            ],
+            // Data Periode HANYA untuk chart batang
+            'barChartData' => [
+                'labels' => $barChartLabels,
+                'data' => $barChartData,
+            ]
+        ]);
+    }
+
+    // Fungsi ini sekarang HANYA untuk chart batang
+    private function getDateRangesForBarChart($scale)
+    {
+        $timezone = config('app.timezone');
+        $endDate = Carbon::now($timezone)->endOfDay();
+
+        switch ($scale) {
+            case '3days':
+                $startDate = Carbon::now($timezone)->subDays(2)->startOfDay();
+                break;
+            case '5days':
+                $startDate = Carbon::now($timezone)->subDays(4)->startOfDay();
+                break;
+            case 'weekly':
+                $startDate = Carbon::now($timezone)->startOfWeek();
+                break;
+            case 'yearly':
+                $startDate = Carbon::now($timezone)->startOfYear();
+                break;
+            case 'monthly':
+            default:
+                $startDate = Carbon::now($timezone)->startOfMonth();
+                break;
+        }
+        return [$startDate, $endDate];
+    }
+
+    // Fungsi ini sekarang selalu menghitung data lifetime
+    private function calculateAnalysisData($totalPemasukan, $totalPengeluaran, $incomes, $expenses, $lastPeriodIncomes, $lastPeriodExpenses, $daysInPeriod)
+    {
+        $incomes = collect($incomes);
+        $expenses = collect($expenses);
+
+        $selisih = $totalPemasukan - $totalPengeluaran;
+        $rasioTabungan = $totalPemasukan > 0 ? ($selisih / $totalPemasukan) * 100 : 0;
+        $pertumbuhanPemasukan = $lastPeriodIncomes > 0 ? (($totalPemasukan - $lastPeriodIncomes) / $lastPeriodIncomes) * 100 : ($totalPemasukan > 0 ? 100 : 0);
+        $pertumbuhanPengeluaran = $lastPeriodExpenses > 0 ? (($totalPengeluaran - $lastPeriodExpenses) / $lastPeriodExpenses) * 100 : ($totalPengeluaran > 0 ? 100 : 0);
+        $pengeluaranTerbesar = $expenses->max('jumlah') ?? 0;
+        $persentasePengeluaranTerbesar = $totalPengeluaran > 0 ? ($pengeluaranTerbesar / $totalPengeluaran) * 100 : 0;
+
+        $jumlahTransaksiPemasukan = $incomes->count();
+        $jumlahTransaksiPengeluaran = $expenses->count();
+        $avgPemasukanPerTransaksi = $jumlahTransaksiPemasukan > 0 ? $totalPemasukan / $jumlahTransaksiPemasukan : 0;
+        $avgPengeluaranPerTransaksi = $jumlahTransaksiPengeluaran > 0 ? $totalPengeluaran / $jumlahTransaksiPengeluaran : 0;
+        $medianPengeluaran = $expenses->median('jumlah') ?? 0;
+
+        $avgPengeluaranPerHari = $daysInPeriod > 0 ? $totalPengeluaran / $daysInPeriod : 0;
+        $frekuensiTransaksiHarian = $daysInPeriod > 0 ? ($jumlahTransaksiPemasukan + $jumlahTransaksiPengeluaran) / $daysInPeriod : 0;
+        
+        $dailyExpenses = $expenses->groupBy(fn($date) => Carbon::parse($date->created_at)->format('Y-m-d'))
+                                  ->map(fn($day) => $day->sum('jumlah'));
+        $stdDevPengeluaranHarian = $this->calculate_std_dev($dailyExpenses->values()->toArray());
+
+        return [
+            'ringkasanUmum' => [['label' => 'Total Pemasukan', 'value' => 'Rp ' . number_format($totalPemasukan, 0, ',', '.')], ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($totalPengeluaran, 0, ',', '.')], ['label' => 'Selisih (Pemasukan Bersih)', 'value' => 'Rp ' . number_format($selisih, 0, ',', '.')],],
+            'rasioPertumbuhan' => [['label' => 'Rasio Tabungan', 'value' => number_format($rasioTabungan, 2) . ' %'], ['label' => 'Pertumbuhan Pemasukan (vs Bulan Lalu)', 'value' => number_format($pertumbuhanPemasukan, 2) . ' %'], ['label' => 'Pertumbuhan Pengeluaran (vs Bulan Lalu)', 'value' => number_format($pertumbuhanPengeluaran, 2) . ' %'], ['label' => 'Persentase Pengeluaran Terbesar', 'value' => number_format($persentasePengeluaranTerbesar, 2) . ' %'],],
+            'analisisTransaksi' => [['label' => 'Jumlah Transaksi Pemasukan', 'value' => $jumlahTransaksiPemasukan], ['label' => 'Jumlah Transaksi Pengeluaran', 'value' => $jumlahTransaksiPengeluaran], ['label' => 'Rata-rata Pemasukan per Transaksi', 'value' => 'Rp ' . number_format($avgPemasukanPerTransaksi, 0, ',', '.')], ['label' => 'Rata-rata Pengeluaran per Transaksi', 'value' => 'Rp ' . number_format($avgPengeluaranPerTransaksi, 0, ',', '.')], ['label' => 'Median Transaksi Pengeluaran', 'value' => 'Rp ' . number_format($medianPengeluaran, 0, ',', '.')],],
+            'harianKonsistensi' => [['label' => 'Rata-rata Pengeluaran per Hari', 'value' => 'Rp ' . number_format($avgPengeluaranPerHari, 0, ',', '.')], ['label' => 'Frekuensi Transaksi Harian', 'value' => number_format($frekuensiTransaksiHarian, 2) . 'x'], ['label' => 'Standar Deviasi Pengeluaran Harian', 'value' => 'Rp ' . number_format($stdDevPengeluaranHarian, 0, ',', '.')],],
+        ];
+    }
+    
+    private function calculate_std_dev(array $arr) {
+        $n = count($arr);
+        if ($n === 0) return 0.0;
+        $mean = array_sum($arr) / $n;
+        $variance = 0.0;
+        foreach ($arr as $x) {
+            $variance += pow($x - $mean, 2);
+        }
+        return (float)sqrt($variance / $n);
+    }
+}
