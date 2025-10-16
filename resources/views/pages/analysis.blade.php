@@ -12,9 +12,6 @@
         x-init="initCharts()"
         class="container mx-auto p-4 sm:p-6 lg:p-8">
 
-        {{-- Judul Halaman --}}
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6">Analisis Keuangan</h1>
-
         {{-- ... HTML untuk Kartu Ringkasan, Pie Chart, dan Analisis tidak berubah ... --}}
         {{-- (Saya persingkat agar tidak terlalu panjang, cukup salin seluruh file dari bawah) --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

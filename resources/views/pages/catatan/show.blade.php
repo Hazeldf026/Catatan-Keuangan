@@ -4,7 +4,7 @@
         Detail Catatan
     </x-slot:title>
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div  class="container mx-auto p-4 sm:p-6 lg:p-8">
         <div class="w-full max-w-2xl mx-auto my-12 bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-lg shadow-md">
 
             {{-- 1. Judul Kartu --}}

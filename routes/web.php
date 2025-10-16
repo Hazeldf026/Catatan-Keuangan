@@ -6,6 +6,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\OtpVerificationController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\RencanaController;
 use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -57,4 +58,7 @@ Route::middleware('auth')->group(function () {
     // == RUTE BARU UNTUK HALAMAN ANALISIS ==
     Route::get('/analysis', [AnalysisController::class, 'showAnalysisPage'])->name('analysis.show');
     Route::get('/analysis/data', [AnalysisController::class, 'getChartData'])->name('analysis.data');
+
+    Route::resource('rencana', RencanaController::class);
+    Route::post('rencana/{rencana}/cancel', [RencanaController::class, 'cancel'])->name('rencana.cancel');
 });

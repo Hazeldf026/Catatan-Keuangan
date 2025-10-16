@@ -16,22 +16,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // =================================================================
+        // LANGKAH 1: MENJALANKAN SEEDER DASAR
+        // =================================================================
         $this->call([
             UserSeeder::class,
-            CategorySeeder::class
+            CategorySeeder::class,
+            RencanaSeeder::class, // <-- Pastikan RencanaSeeder dipanggil di sini
         ]);
 
         // =================================================================
-        // LANGKAH 1: PERSIAPAN
+        // LANGKAH 2: PERSIAPAN DATA UNTUK CATATAN
         // =================================================================
-
         $users = User::all();
-        // Ambil dan pisahkan kategori berdasarkan tipenya
         $pemasukanCategories = Category::where('tipe', 'pemasukan')->get();
         $pengeluaranCategories = Category::where('tipe', 'pengeluaran')->get();
         
-        // Definisikan user target yang akan kita kontrol
-        // Pastikan user dengan email ini ada di database (misal dari UserSeeder)
         $targetUserEmail = 'hazeldf11@gmail.com';
         
         if ($users->isEmpty() || $pemasukanCategories->isEmpty() || $pengeluaranCategories->isEmpty()) {
@@ -42,61 +42,74 @@ class DatabaseSeeder extends Seeder
         $endDate = Carbon::now();
 
         // =================================================================
-        // LANGKAH 2: LOOPING DENGAN LOGIKA KONDISIONAL
+        // LANGKAH 3: LOOPING UNTUK MEMBUAT CATATAN DENGAN KONEKSI KE RENCANA
         // =================================================================
-
         foreach ($users as $user) {
             
             // --- BLOK LOGIKA KHUSUS UNTUK USER TARGET ---
             if ($user->email === $targetUserEmail) {
                 
-                // Inisialisasi pelacak keuangan untuk user ini
+                // Ambil semua rencana 'berjalan' milik user target
+                $userRencanas = $user->rencanas()->where('status', 'berjalan')->get();
+
                 $totalPemasukan = 0;
                 $totalPengeluaran = 0;
 
-                // Loop untuk membuat catatan satu per satu
                 for ($i = 0; $i < $recordsPerUser; $i++) {
                     
-                    // Logika Cerdas: Tentukan tipe transaksi berikutnya
                     $currentRatio = ($totalPemasukan > 0) ? $totalPengeluaran / $totalPemasukan : 0;
-                    
-                    $isPemasukan = true; // Default-nya pemasukan
+                    $isPemasukan = ($currentRatio < 0.65) ? (rand(1, 100) <= 60) : true;
 
-                    // Jika rasio masih di bawah 65% (buffer), kita beri kesempatan untuk pengeluaran
-                    // Jika tidak, kita paksa jadi pemasukan untuk menyeimbangkan.
-                    if ($currentRatio < 0.65) {
-                        // 60% kemungkinan pemasukan, 40% kemungkinan pengeluaran
-                        $isPemasukan = rand(1, 100) <= 60;
-                    }
+                    $attributes = [
+                        'user_id' => $user->id,
+                        'created_at' => $endDate->copy()->subDays($i),
+                        'updated_at' => $endDate->copy()->subDays($i),
+                    ];
 
-                    // Buat satu catatan dengan data yang sudah ditentukan
                     if ($isPemasukan) {
-                        $jumlah = rand(50000, 1000000); // Pemasukan lebih besar
-                        $category = $pemasukanCategories->random();
+                        $jumlah = rand(50000, 1000000);
+                        $attributes['category_id'] = $pemasukanCategories->random()->id;
+                        $attributes['jumlah'] = $jumlah;
                         $totalPemasukan += $jumlah;
-                    } else {
-                        $jumlah = rand(10000, 300000); // Pengeluaran lebih kecil
-                        $category = $pengeluaranCategories->random();
+
+                        // === LOGIKA BARU UNTUK MENGHUBUNGKAN CATATAN KE RENCANA ===
+                        // 25% kemungkinan pemasukan ini akan dialokasikan ke rencana
+                        if (!$userRencanas->isEmpty() && rand(1, 100) <= 25) {
+                            $rencana = $userRencanas->random();
+
+                            // Hanya alokasikan jika rencana belum selesai
+                            if ($rencana->jumlah_terkumpul < $rencana->target_jumlah) {
+                                $attributes['alokasi'] = 'rencana';
+                                $attributes['rencana_id'] = $rencana->id;
+
+                                // Update jumlah terkumpul di rencana
+                                $rencana->increment('jumlah_terkumpul', $jumlah);
+
+                                // Cek apakah rencana sudah selesai setelah ditambah
+                                if ($rencana->fresh()->jumlah_terkumpul >= $rencana->target_jumlah) {
+                                    $rencana->update(['status' => 'selesai']);
+                                }
+                            }
+                        }
+                        // ========================================================
+                        
+                    } else { // Jika Pengeluaran
+                        $jumlah = rand(10000, 300000);
+                        $attributes['category_id'] = $pengeluaranCategories->random()->id;
+                        $attributes['jumlah'] = $jumlah;
                         $totalPengeluaran += $jumlah;
                     }
 
-                    Catatan::factory()->create([
-                        'user_id' => $user->id,
-                        'category_id' => $category->id,
-                        'jumlah' => $jumlah,
-                        'created_at' => $endDate->copy()->subDays($i),
-                        'updated_at' => $endDate->copy()->subDays($i),
-                    ]);
+                    // Buat catatan dengan atribut yang sudah ditentukan
+                    Catatan::factory()->create($attributes);
                 }
 
-            // --- BLOK LOGIKA LAMA UNTUK USER LAINNYA ---
+            // --- BLOK LOGIKA UNTUK USER LAINNYA ---
             } else {
                 Catatan::factory($recordsPerUser)
                     ->for($user)
-                    // Untuk user lain, kategorinya acak (mix pemasukan & pengeluaran)
-                    ->recycle(Category::all()) 
-                    ->datesBackwardsFrom($endDate)
-                    ->create();
+                    ->recycle(Category::all())
+                    ->create(); // Membuat 50 catatan acak untuk user lain
             }
         }
     }

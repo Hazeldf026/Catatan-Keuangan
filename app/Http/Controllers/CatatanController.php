@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Catatan;
 use App\Models\Category;
+use App\Models\Rencana;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CatatanController extends Controller
 {
@@ -87,7 +89,8 @@ class CatatanController extends Controller
     public function create()
     {
         $categories = Category::orderBy('tipe')->get();
-        return view('pages.catatan.create', compact('categories'));
+        $rencanas = Rencana::where('user_id', Auth::id())->where('status', 'berjalan')->get();
+        return view('pages.catatan.create', compact('categories', 'rencanas'));
     }
 
     /**
@@ -96,31 +99,49 @@ class CatatanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-        'deskripsi' => 'required|string|max:255',
-        'tipe' => 'required|in:pemasukan,pengeluaran',
-        'jumlah' => 'required|numeric',
-        'category_id' => 'nullable|exists:categories,id',
-        'custom_category' => 'nullable|string|max:255',
+            'deskripsi' => 'required|string|max:255',
+            'tipe' => 'required|in:pemasukan,pengeluaran',
+            'jumlah' => 'required|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'custom_category' => 'nullable|string|max:255',
+            'alokasi' => 'nullable|in:rencana,simpanan',
+            'rencana_id' => 'nullable|exists:rencanas,id',
         ]);
 
-        // Handle "Lainnya..." option
-        $categoryId = $request->input('category_id');
-        $customCategory = null;
-        $tipe = $request->input('tipe');
+        DB::transaction(function () use ($request) {
+            $categoryId = $request->input('category_id');
+            $customCategory = null;
+            $tipe = $request->input('tipe');
+            $lainnyaCategory = Category::where('nama', 'Lainnya...')->where('tipe', $tipe)->first();
+            if ($lainnyaCategory && $categoryId == $lainnyaCategory->id) {
+                $customCategory = $request->input('custom_category');
+            }
+            
+            $catatan = $request->user()->catatan()->create([
+                'deskripsi' => $request->input('deskripsi'),
+                'jumlah' => $request->input('jumlah'),
+                'category_id' => $categoryId,
+                'custom_category' => $customCategory,
+                'alokasi' => $request->input('alokasi'),
+                'rencana_id' => $request->input('alokasi') === 'rencana' ? $request->input('rencana_id') : null,
+            ]);
 
-        $lainnyaCategory = Category::where('nama', 'Lainnya...')->where('tipe', $tipe)->first();
-
-        if ($lainnyaCategory && $categoryId == $lainnyaCategory->id) {
-            $customCategory = $request->input('custom_category');
-        }
-
-        $request->user()->catatan()->create([
-        'user_id' => Auth::id(),
-        'deskripsi' => $request->input('deskripsi'),
-        'jumlah' => $request->input('jumlah'),
-        'category_id' => $categoryId,
-        'custom_category' => $customCategory,
-        ]);
+            if ($catatan->alokasi === 'rencana' && $catatan->rencana_id) {
+                $rencana = Rencana::find($catatan->rencana_id);
+                if ($rencana && $rencana->user_id == Auth::id()) {
+                    // PERBAIKAN FINAL: Hitung total baru di variabel
+                    $newTotal = $rencana->jumlah_terkumpul + $catatan->jumlah;
+                    
+                    // Lakukan update database
+                    $rencana->increment('jumlah_terkumpul', $catatan->jumlah);
+                    
+                    // Gunakan variabel untuk perbandingan yang pasti
+                    if ($newTotal >= $rencana->target_jumlah) {
+                        $rencana->update(['status' => 'selesai']);
+                    }
+                }
+            }
+        });
 
         return redirect()->route('catatan.index')->with('success', 'Catatan berhasil ditambahkan!');
     }
@@ -138,7 +159,12 @@ class CatatanController extends Controller
      */
     public function edit(Catatan $catatan)
     {
+        // Pastikan pengguna hanya bisa mengedit catatannya sendiri
+        abort_if($catatan->user_id !== Auth::id(), 403);
+        
         $categories = Category::orderBy('tipe')->get();
+        // Ambil semua rencana milik pengguna yang statusnya masih 'berjalan'
+        $rencanas = Rencana::where('user_id', Auth::id())->where('status', 'berjalan')->get();
         return view('pages.catatan.edit', compact('catatan', 'categories'));
     }
 
@@ -148,33 +174,65 @@ class CatatanController extends Controller
     public function update(Request $request, Catatan $catatan)
     {
         $request->validate([
-        'deskripsi' => 'required|string|max:255',
-        'tipe' => 'required|in:pemasukan,pengeluaran',
-        'jumlah' => 'required|numeric',
-        'category_id' => 'nullable|exists:categories,id',
-        'custom_category' => 'nullable|string|max:255',
+            'deskripsi' => 'required|string|max:255',
+            'tipe' => 'required|in:pemasukan,pengeluaran',
+            'jumlah' => 'required|numeric|min:0',
+            'category_id' => 'nullable|exists:categories,id',
+            'custom_category' => 'nullable|string|max:255',
+            'alokasi' => 'nullable|in:rencana,simpanan',
+            'rencana_id' => 'nullable|exists:rencanas,id',
         ]);
+        
+        DB::transaction(function () use ($request, $catatan) {
+        $oldAmount = $catatan->jumlah;
+        $oldRencanaId = $catatan->rencana_id;
 
-        // Handle "Lainnya..." option
+        // ... logika update catatan Anda ...
         $categoryId = $request->input('category_id');
         $customCategory = null;
         $tipe = $request->input('tipe');
-
         $lainnyaCategory = Category::where('nama', 'Lainnya...')->where('tipe', $tipe)->first();
-
         if ($lainnyaCategory && $categoryId == $lainnyaCategory->id) {
             $customCategory = $request->input('custom_category');
         }
-
         $catatan->update([
-        'user_id' => Auth::id(),
-        'deskripsi' => $request->input('deskripsi'),
-        'jumlah' => $request->input('jumlah'),
-        'category_id' => $categoryId,
-        'custom_category' => $customCategory,
+            'user_id' => Auth::id(),
+            'deskripsi' => $request->input('deskripsi'),
+            'jumlah' => $request->input('jumlah'),
+            'category_id' => $categoryId,
+            'custom_category' => $customCategory,
+            'alokasi' => $request->input('alokasi'),
+            'rencana_id' => $request->input('alokasi') === 'rencana' ? $request->input('rencana_id') : null,
         ]);
 
-        return redirect()->route('catatan.index')->with('success', 'Catatan berhasil diperbarui!');
+
+        $newRencanaId = $catatan->rencana_id;
+        $newAmount = $catatan->jumlah;
+
+        if ($oldRencanaId) {
+            $oldRencana = Rencana::find($oldRencanaId);
+            if ($oldRencana) {
+                $newTotal = $oldRencana->jumlah_terkumpul - $oldAmount;
+                $oldRencana->decrement('jumlah_terkumpul', $oldAmount);
+                if ($newTotal < $oldRencana->target_jumlah) {
+                    $oldRencana->update(['status' => 'berjalan']);
+                }
+            }
+        }
+
+        if ($newRencanaId) {
+            $newRencana = Rencana::find($newRencanaId);
+            if ($newRencana) {
+                $newTotal = $newRencana->jumlah_terkumpul + $newAmount;
+                $newRencana->increment('jumlah_terkumpul', $newAmount);
+                if ($newTotal >= $newRencana->target_jumlah) {
+                    $newRencana->update(['status' => 'selesai']);
+                }
+            }
+        }
+    });
+
+    return redirect()->route('catatan.index')->with('success', 'Catatan berhasil diperbarui!');
     }
 
     /**
@@ -182,7 +240,24 @@ class CatatanController extends Controller
      */
     public function destroy(Catatan $catatan)
     {
+        DB::transaction(function () use ($catatan) {
+        $amount = $catatan->jumlah;
+        $rencanaId = $catatan->rencana_id;
+    
         $catatan->delete();
-        return redirect()->route('catatan.index')->with('success', 'Catatan berhasil dihapus!');
+    
+        if ($rencanaId) {
+            $rencana = Rencana::find($rencanaId);
+            if ($rencana) {
+                $newTotal = $rencana->jumlah_terkumpul - $amount;
+                $rencana->decrement('jumlah_terkumpul', $amount);
+                if ($newTotal < $rencana->target_jumlah) {
+                    $rencana->update(['status' => 'berjalan']);
+                }
+            }
+        }
+    });
+    
+    return redirect()->route('catatan.index')->with('success', 'Catatan berhasil dihapus!');
     }
 }

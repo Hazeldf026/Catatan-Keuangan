@@ -11,8 +11,15 @@ class Catatan extends Model
 {
         use HasFactory;
 
-    protected $fillable = ['category_id', 'custom_category', 'deskripsi', 'jumlah',];
-
+    protected $fillable = [
+        'user_id', 
+        'category_id', 
+        'alokasi',
+        'rencana_id',
+        'custom_category', 
+        'deskripsi', 
+        'jumlah'
+    ];
     protected $with = ['category'];
 
         public function user(): BelongsTo
@@ -23,6 +30,11 @@ class Catatan extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function rencana(): BelongsTo
+    {
+        return $this->belongsTo(Rencana::class);
     }
 
     public function getCategoryNameAttribute()
