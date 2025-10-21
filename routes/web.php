@@ -10,6 +10,10 @@ use App\Http\Controllers\personal\RencanaController;
 use App\Http\Controllers\personal\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\personal\GrupController;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\group\CatatanGroupController;
+use App\Http\Controllers\group\RencanaGroupController;
+use App\Models\Grup;
 
 // Rute untuk Tamu (Guest) - Pengguna yang BELUM Login
 Route::middleware('guest')->group(function () {
@@ -64,5 +68,27 @@ Route::middleware('auth')->group(function () {
 
     Route::get('grup', [GrupController::class, 'index'])->name('grup.index');
     Route::post('grup', [GrupController::class, 'store'])->name('grup.store');
+    Route::get('grup/find', [GrupController::class, 'findGrupByCode'])->name('grup.find');
     Route::post('grup/join', [GrupController::class, 'join'])->name('grup.join');
+
+    Route::prefix('group/{grup}') // Menggunakan route model binding {grup}
+        ->name('group.') // Nama route diawali 'grup.' (cth: grup.catatan.index)
+        ->group(function () {
+
+            Route::resource('catatan', CatatanGroupController::class);
+
+            Route::resource('rencana', RencanaGroupController::class);
+
+            Route::fallback(function (Grup $grup) {
+                if (!$grup->users()->where('user_id', Auth::id())->exists()) {
+                    abort(403, 'Anda bukan anggota grup ini.');
+                }
+                // Jika user ada di grup tapi route tidak ditemukan di dalam grup
+                abort(404);
+            });
+        });
+});
+
+Route::fallback(function () {
+    return redirect('/login'); // Atau tampilkan halaman 404
 });

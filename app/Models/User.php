@@ -63,11 +63,34 @@ class User extends Authenticatable
 
     public function grups(): BelongsToMany
     {
-        return $this->belongsToMany(Grup::class, 'grup_user');
+        return $this->belongsToMany(Grup::class, 'grup_user')
+                    ->withPivot('role') // Ambil data role
+                    ->withTimestamps();
     }
     
     public function ownedGrups(): HasMany
     {
         return $this->hasMany(Grup::class, 'user_id');
+    }
+
+    public function grupCatatans(): HasMany
+    {
+        return $this->hasMany(GrupCatatan::class);
+    }
+
+    public function grupRencanas(): HasMany 
+    {
+        return $this->hasMany(GrupRencana::class);
+    }
+
+    public function getRoleInGroup(Grup $grup): ?string 
+    {
+        $keanggotaan = $this->grups()->find($grup->id);
+        return $keanggotaan ? $keanggotaan->pivot->role : null;
+    }
+
+    public function isAdminInGroup(Grup $grup): bool 
+    {
+        return $this->getRoleInGroup($grup) === 'admin';
     }
 }

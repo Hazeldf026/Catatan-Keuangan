@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Grup extends Model
 {
@@ -23,7 +24,9 @@ class Grup extends Model
      */
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'grup_user');
+        return $this->belongsToMany(User::class, 'grup_user')
+                    ->withPivot('role') // Ambil data role
+                    ->withTimestamps();
     }
 
     /**
@@ -32,5 +35,27 @@ class Grup extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function grupCatatans(): HasMany // Atau nama lain yg kamu suka
+    {
+        return $this->hasMany(GrupCatatan::class);
+    }
+
+    public function grupRencanas(): HasMany 
+    {
+        return $this->hasMany(GrupRencana::class);
+    }
+
+    public function getUserRole(User $user): ?string 
+    {
+        // Pastikan user adalah anggota
+        $anggota = $this->users()->find($user->id);
+        return $anggota ? $anggota->pivot->role : null;
+    }
+
+    public function isUserAdmin(User $user): bool 
+    {
+        return $this->getUserRole($user) === 'admin';
     }
 }

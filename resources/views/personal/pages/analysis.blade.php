@@ -1,4 +1,4 @@
-<x-layout>
+<x-personal::layout>
     <x-slot:title>
         Analisis | Credix
     </x-slot:title>
@@ -319,4 +319,4 @@
             }
         }
     </script>
-</x-layout>
+</x-personal::layout>

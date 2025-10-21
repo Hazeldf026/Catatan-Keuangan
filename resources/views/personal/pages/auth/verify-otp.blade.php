@@ -1,4 +1,4 @@
-@extends('app')
+@extends('personal.app')
 
 @section('start')
     <section class="bg-gray-50 dark:bg-gray-900">

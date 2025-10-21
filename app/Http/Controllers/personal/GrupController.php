@@ -44,9 +44,39 @@ class GrupController extends Controller
         ]);
 
         // Secara otomatis masukkan pembuat grup sebagai anggota pertama
-        $grup->users()->attach($user->id);
+        $grup->users()->attach($user->id, ['role' => 'admin']);
 
         return redirect()->route('grup.index')->with('success', 'Grup berhasil dibuat!');
+    }
+
+    public function findGrupByCode(Request $request)
+    {
+        $request->validate(['grup_code' => 'required|string|size:8']); // Kode harus 8 digit
+
+        $user = Auth::user();
+        $grupCode = strtoupper($request->grup_code); // Pastikan uppercase
+
+        $grup = Grup::where('grup_code', $grupCode)->withCount('users')->first();
+
+        // Kasus 1: Kode tidak ditemukan
+        if (!$grup) {
+            return response()->json(['error' => 'Kode grup tidak ditemukan.'], 404);
+        }
+
+        // Kasus 2: User sudah jadi anggota
+        if ($grup->users()->where('user_id', $user->id)->exists()) {
+            return response()->json(['error' => 'Kamu sudah bergabung dengan grup ini.'], 409); // 409 Conflict
+        }
+
+        // Kasus 3: Grup ditemukan & user belum join
+        return response()->json([
+            'id' => $grup->id,
+            'nama' => $grup->nama,
+            'deskripsi' => $grup->deskripsi,
+            'grup_code' => $grup->grup_code,
+            'users_count' => $grup->users_count,
+            'owner_name' => $grup->owner->name ?? 'N/A', // Ambil nama pemilik jika relasi 'owner' ada
+        ]);
     }
 
     /**
@@ -54,29 +84,33 @@ class GrupController extends Controller
      */
     public function join(Request $request)
     {
+        // Sekarang validasi ID grup, bukan kode
         $request->validate([
-            // Validasi: kode harus ada, dan harus ada di tabel 'grups'
-            'grup_code' => [
+            'grup_id' => [
                 'required',
-                'string',
-                Rule::exists('grups', 'grup_code'),
+                Rule::exists('grups', 'id'), // Pastikan ID grup valid
             ],
         ]);
 
         $user = Auth::user();
-        $grup = Grup::where('grup_code', $request->grup_code)->first();
+        $grup = Grup::find($request->grup_id);
 
-        // Cek apakah user sudah ada di grup
+        // Double check (seharusnya tidak terjadi jika findGrupByCode benar)
+        if (!$grup) {
+            return redirect()->route('grup.index')->with('error', 'Grup tidak ditemukan.');
+        }
         if ($grup->users()->where('user_id', $user->id)->exists()) {
             return redirect()->route('grup.index')->with('error', 'Kamu sudah bergabung dengan grup ini!');
         }
 
-        // Jika belum, masukkan user ke grup
+        // Masukkan user ke grup
         $grup->users()->attach($user->id);
 
-        return redirect()->route('grup.index')->with('success', 'Berhasil bergabung dengan grup ' . $grup->nama . '!');
+        // [PENTING] Redirect ke halaman catatan grup (buat route placeholder nanti)
+        // Gunakan ID grup dalam route
+        return redirect()->route('group.catatan.index', ['grup' => $grup->id])
+                        ->with('success', 'Berhasil bergabung dengan grup ' . $grup->nama . '!');
     }
-
     /**
      * Helper untuk membuat kode unik.
      */
@@ -84,7 +118,7 @@ class GrupController extends Controller
     {
         do {
             $code = Str::upper(Str::random(8));
-        } while (Grup::where('grup_code', $code)->exists()); // Pastikan kode belum dipakai
+        } while (Grup::where('grup_code', $code)->exists());
 
         return $code;
     }

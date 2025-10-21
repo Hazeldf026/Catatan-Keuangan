@@ -1,4 +1,4 @@
-<x-layout>
+<x-personal::layout>
     <x-slot:title>
         Detail Rencana: {{ $rencana->nama }}
     </x-slot:title>

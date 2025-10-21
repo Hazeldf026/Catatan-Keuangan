@@ -1,5 +1,5 @@
 {{-- resources/views/pages/catatan/show.blade.php --}}
-<x-layout>
+<x-personal::layout>
     <x-slot:title>
         Detail Catatan
     </x-slot:title>

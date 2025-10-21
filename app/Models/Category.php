@@ -16,4 +16,9 @@ class Category extends Model
     {
         return $this->hasMany(Catatan::class);
     }
+
+    public function grupCatatans(): HasMany
+    {
+        return $this->hasMany(GrupCatatan::class);
+    }
 }

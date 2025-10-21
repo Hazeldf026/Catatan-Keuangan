@@ -1,4 +1,4 @@
-<x-layout>
+<x-personal::layout>
     <x-slot:title>
         Rencana Keuangan | Credix
     </x-slot:title>
@@ -129,4 +129,4 @@
             </div>
         </div>
     </div>
-</x-layout>
+</x-personal::layout>
