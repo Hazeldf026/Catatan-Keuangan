@@ -31,15 +31,57 @@ class AnalysisController extends Controller
         // =================================================================
         // BAGIAN 1: PERHITUNGAN DATA LIFETIME & ANALISIS
         // =================================================================
-        $lifetimePemasukanQuery = Catatan::where('user_id', $userId)
-            ->whereHas('category', fn($q) => $q->where('tipe', 'pemasukan'));
         
+        // Kueri Pemasukan/Pengeluaran (tetap sama)
+        $lifetimePemasukanQuery = Catatan::where('user_id', $userId)
+            ->whereHas('category', fn ($q) => $q->where('tipe', 'pemasukan'));
         $lifetimePengeluaranQuery = Catatan::where('user_id', $userId)
-            ->whereHas('category', fn($q) => $q->where('tipe', 'pengeluaran'));
-
+            ->whereHas('category', fn ($q) => $q->where('tipe', 'pengeluaran'));
         $totalPemasukanLifetime = (clone $lifetimePemasukanQuery)->sum('jumlah');
         $totalPengeluaranLifetime = (clone $lifetimePengeluaranQuery)->sum('jumlah');
+
+        // --- [PERBAIKAN TOTAL UNTUK MEDIA CHART] ---
+
+        // 1. Definisikan peta warna (HANYA 4 media, sesuai permintaanmu)
+        $mediaColorMap = [
+            'wallet'     => 'rgba(249, 115, 22, 0.8)',  // orange-500
+            'bank'       => 'rgba(139, 92, 246, 0.8)',  // violet-500 (ungu)
+            'e-wallet'   => 'rgba(14, 165, 233, 0.8)',  // sky-500 (biru muda)
+            'tabungan'   => 'rgba(234, 179, 8, 0.8)',   // yellow-500 (kuning)
+        ];
         
+        // 2. Ambil data SALDO per media dari database
+        $mediaBalances = Catatan::where('catatans.user_id', $userId)
+            ->whereNotNull('media')
+            ->join('categories', 'catatans.category_id', '=', 'categories.id')
+            // [PERBAIKAN 1] Paksa media menjadi lowercase di level SQL
+            ->groupBy(DB::raw('LOWER(media)')) 
+            ->select(
+                DB::raw('LOWER(media) as media'), // [PERBAIKAN 1]
+                DB::raw('SUM(CASE WHEN categories.tipe = "pemasukan" THEN catatans.jumlah ELSE -catatans.jumlah END) as total')
+            )
+            ->orderBy('total', 'desc')
+            ->get();
+        
+        // [PERBAIKAN 2] Hapus filter positive balance agar 'e-wallet' dan 'tabungan' (jika 0) tetap ada.
+        // $positiveMediaBalances = $mediaBalances->filter(fn ($item) => $item->total > 0);
+        // Kita pakai $mediaBalances langsung
+
+        // 3. Proses data media
+        $mediaPieChartLabels = $mediaBalances->pluck('media');
+        
+        // 4. Proses data (jika total < 0, jadikan 0 untuk chart)
+        $mediaPieChartData = $mediaBalances->map(fn ($item) => $item->total > 0 ? $item->total : 0);
+        
+        // 5. Proses warna
+        $mediaPieChartColors = $mediaBalances->map(fn ($item) =>
+            // [PERBAIKAN 3] Key dijamin lowercase oleh SQL. Hapus 'Lainnya'.
+            $mediaColorMap[$item->media] ?? 'rgba(156, 163, 175, 0.8)' // Fallback abu-abu jika ada data media aneh
+        );
+        
+        // --- Akhir Perbaikan Media Chart ---
+
+        // Kueri sisa untuk data analisis (tetap sama)
         $incomesLifetime = (clone $lifetimePemasukanQuery)->get();
         $expensesLifetime = (clone $lifetimePengeluaranQuery)->get();
         $prevMonthStartDate = Carbon::now()->subMonth()->startOfMonth();
@@ -52,7 +94,7 @@ class AnalysisController extends Controller
         $analysisData = $this->calculateAnalysisData($totalPemasukanLifetime, $totalPengeluaranLifetime, $incomesLifetime, $expensesLifetime, $lastPeriodIncomes, $lastPeriodExpenses, $daysInPeriodLifetime);
 
         // =================================================================
-        // BAGIAN 2: PERHITUNGAN DATA LINE CHART
+        // BAGIAN 2: PERHITUNGAN DATA LINE CHART (Tetap sama)
         // =================================================================
         $lineChartData = $this->generateLineChartData($userId, $scale, $targetDate);
 
@@ -70,65 +112,71 @@ class AnalysisController extends Controller
                     'pemasukan' => $totalPemasukanLifetime,
                     'pengeluaran' => $totalPengeluaranLifetime,
                 ],
-                // INI BAGIAN PALING PENTING, PASTIKAN ADA DI SINI
+                'mediaPieChart' => [
+                    'labels' => $mediaPieChartLabels,
+                    'data' => $mediaPieChartData,
+                    'colors' => $mediaPieChartColors,
+                ],
                 'analysisData' => $analysisData,
             ],
             'lineChartData' => $lineChartData,
         ]);
-}
-
-    private function generateLineChartData($userId, $scale, Carbon $targetDate)
-{
-    [$startDate, $endDate, $unit] = $this->getDateBounds($scale, $targetDate);
-
-    $initialBalance = Catatan::where('user_id', $userId)
-        ->where('catatans.created_at', '<', $startDate)
-        ->join('categories', 'catatans.category_id', '=', 'categories.id')
-        ->select(DB::raw('SUM(CASE WHEN categories.tipe = "pemasukan" THEN catatans.jumlah ELSE -catatans.jumlah END) as balance'))
-        ->value('balance') ?? 0;
-
-    $transactions = Catatan::where('user_id', $userId)
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->with('category')
-        ->orderBy('created_at')
-        ->get();
-    
-    $groupedTransactions = $transactions->groupBy(function ($item) use ($unit) {
-        return Carbon::parse($item->created_at)->startOf($unit)->timestamp;
-    });
-
-    $linePoints = [];
-    $runningBalance = $initialBalance;
-    
-    $currentDate = $startDate->copy();
-    while ($currentDate <= $endDate) {
-        
-        // [PERBAIKAN] Hentikan loop jika tanggal sudah melewati hari ini
-        if ($currentDate->isFuture()) {
-            break;
-        }
-
-        $periodTimestamp = $currentDate->copy()->startOf($unit)->timestamp;
-        $periodTransactions = $groupedTransactions->get($periodTimestamp, collect());
-
-        $close = $runningBalance;
-        if ($periodTransactions->isNotEmpty()) {
-            foreach ($periodTransactions as $transaction) {
-                $close += ($transaction->category->tipe === 'pemasukan' ? $transaction->jumlah : -$transaction->jumlah);
-            }
-        }
-
-        $linePoints[] = [
-            'x' => $currentDate->valueOf(),
-            'y' => (float)$close,
-        ];
-        
-        $runningBalance = $close;
-        $currentDate->add(1, $unit);
     }
 
-    return $linePoints;
-}
+    // ... (Sisa file, semua fungsi helper di bawah ini tetap sama) ...
+
+    private function generateLineChartData($userId, $scale, Carbon $targetDate)
+    {
+        [$startDate, $endDate, $unit] = $this->getDateBounds($scale, $targetDate);
+
+        $initialBalance = Catatan::where('user_id', $userId)
+            ->where('catatans.created_at', '<', $startDate)
+            ->join('categories', 'catatans.category_id', '=', 'categories.id')
+            ->select(DB::raw('SUM(CASE WHEN categories.tipe = "pemasukan" THEN catatans.jumlah ELSE -catatans.jumlah END) as balance'))
+            ->value('balance') ?? 0;
+
+        $transactions = Catatan::where('user_id', $userId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->with('category')
+            ->orderBy('created_at')
+            ->get();
+
+        $groupedTransactions = $transactions->groupBy(function ($item) use ($unit) {
+            return Carbon::parse($item->created_at)->startOf($unit)->timestamp;
+        });
+
+        $linePoints = [];
+        $runningBalance = $initialBalance;
+
+        $currentDate = $startDate->copy();
+        while ($currentDate <= $endDate) {
+
+            if ($currentDate->isFuture()) {
+                break;
+            }
+
+            $periodTimestamp = $currentDate->copy()->startOf($unit)->timestamp;
+            $periodTransactions = $groupedTransactions->get($periodTimestamp, collect());
+
+            $close = $runningBalance;
+            if ($periodTransactions->isNotEmpty()) {
+                foreach ($periodTransactions as $transaction) {
+                    $close += ($transaction->category->tipe === 'pemasukan' ? $transaction->jumlah : -$transaction->jumlah);
+                }
+            }
+
+            $linePoints[] = [
+                'x' => $currentDate->valueOf(),
+                'y' => (float)$close,
+            ];
+
+            $runningBalance = $close;
+            $currentDate->add(1, $unit);
+        }
+
+        return $linePoints;
+    }
+
     private function getDateBounds($scale, Carbon $targetDate)
     {
         $unit = 'day';
@@ -140,7 +188,7 @@ class AnalysisController extends Controller
             case 'yearly':
                 $startDate = $targetDate->copy()->startOfYear();
                 $endDate = $targetDate->copy()->endOfYear();
-                $unit = 'month'; // Dalam tampilan tahunan, unit per titik adalah bulan
+                $unit = 'month';
                 break;
             case 'monthly':
             default:
@@ -151,8 +199,6 @@ class AnalysisController extends Controller
         return [$startDate, $endDate, $unit];
     }
 
-    
-    // Fungsi calculateAnalysisData dan lainnya tetap sama
     private function calculateAnalysisData($totalPemasukan, $totalPengeluaran, $incomes, $expenses, $lastPeriodIncomes, $lastPeriodExpenses, $daysInPeriod)
     {
         $incomes = collect($incomes);
@@ -170,7 +216,7 @@ class AnalysisController extends Controller
         $medianPengeluaran = $expenses->median('jumlah') ?? 0;
         $avgPengeluaranPerHari = $daysInPeriod > 0 ? $totalPengeluaran / $daysInPeriod : 0;
         $frekuensiTransaksiHarian = $daysInPeriod > 0 ? ($jumlahTransaksiPemasukan + $jumlahTransaksiPengeluaran) / $daysInPeriod : 0;
-        $dailyExpenses = $expenses->groupBy(fn($date) => Carbon::parse($date->created_at)->format('Y-m-d'))->map(fn($day) => $day->sum('jumlah'));
+        $dailyExpenses = $expenses->groupBy(fn ($date) => Carbon::parse($date->created_at)->format('Y-m-d'))->map(fn ($day) => $day->sum('jumlah'));
         $stdDevPengeluaranHarian = $this->calculate_std_dev($dailyExpenses->values()->toArray());
         return [
             'ringkasanUmum' => [['label' => 'Total Pemasukan', 'value' => 'Rp ' . number_format($totalPemasukan, 0, ',', '.')], ['label' => 'Total Pengeluaran', 'value' => 'Rp ' . number_format($totalPengeluaran, 0, ',', '.')], ['label' => 'Selisih', 'value' => 'Rp ' . number_format($selisih, 0, ',', '.')],],
@@ -179,7 +225,9 @@ class AnalysisController extends Controller
             'harianKonsistensi' => [['label' => 'Rata-rata Pengeluaran per Hari', 'value' => 'Rp ' . number_format($avgPengeluaranPerHari, 0, ',', '.')], ['label' => 'Frekuensi Transaksi Harian', 'value' => number_format($frekuensiTransaksiHarian, 2) . 'x'], ['label' => 'Standar Deviasi Pengeluaran Harian', 'value' => 'Rp ' . number_format($stdDevPengeluaranHarian, 0, ',', '.')],],
         ];
     }
-    private function calculate_std_dev(array $arr) {
+    
+    private function calculate_std_dev(array $arr)
+    {
         $n = count($arr);
         if ($n === 0) return 0.0;
         $mean = array_sum($arr) / $n;

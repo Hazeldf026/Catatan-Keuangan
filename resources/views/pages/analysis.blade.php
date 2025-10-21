@@ -12,8 +12,7 @@
         x-init="initCharts()"
         class="container mx-auto p-4 sm:p-6 lg:p-8">
 
-        {{-- ... HTML untuk Kartu Ringkasan, Pie Chart, dan Analisis tidak berubah ... --}}
-        {{-- (Saya persingkat agar tidak terlalu panjang, cukup salin seluruh file dari bawah) --}}
+        {{-- Kartu Ringkasan (Tidak berubah) --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
                 <div class="bg-green-100 dark:bg-green-900 p-3 rounded-full"><svg class="w-6 h-6 text-green-600 dark:text-green-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1M2 5h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg></div>
@@ -28,7 +27,9 @@
                 <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Saat Ini</h4><p id="summary-saldo" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
             </div>
         </div>
+        
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            {{-- Line Chart (Tidak berubah) --}}
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Tren Keuangan</h3>
@@ -45,14 +46,52 @@
                 </div>
                 <div class="h-64"><canvas id="lineChart"></canvas></div>
             </div>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Komposisi Keuangan</h3>
-                <div class="h-64"><canvas id="pieChart"></canvas></div>
+
+            {{-- Kartu Pie Chart Carousel (Tidak berubah) --}}
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md relative overflow-hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                        <span x-show="activeSlide === 1" x-transition>Komposisi Keuangan</span>
+                        <span x-show="activeSlide === 2" x-transition x-cloak>Komposisi Media (Pengeluaran)</span>
+                    </h3>
+                </div>
+
+                <div class="relative h-64">
+                    <div x-show="activeSlide === 1" x-transition class="absolute inset-0 h-64">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                    
+                    <div x-show="activeSlide === 2" x-transition x-cloak class="absolute inset-0 h-64">
+                        <canvas id="mediaPieChart"></canvas>
+                    </div>
+                </div>
+
+                <button @click="activeSlide = (activeSlide === 1) ? totalSlides : activeSlide - 1" 
+                        class="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-800/50 text-white hover:bg-gray-800/70 z-10 opacity-70 hover:opacity-100 transition-opacity">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button @click="activeSlide = (activeSlide === totalSlides) ? 1 : activeSlide + 1" 
+                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-gray-800/50 text-white hover:bg-gray-800/70 z-10 opacity-70 hover:opacity-100 transition-opacity">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+
+                <div class="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10">
+                    <template x-for="i in totalSlides" :key="i">
+                        <button 
+                            @click="activeSlide = i" 
+                            :class="activeSlide === i ? 'bg-blue-600 dark:bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'" 
+                            class="w-3 h-3 rounded-full transition-colors"></button>
+                    </template>
+                </div>
             </div>
         </div>
+
+        {{-- Bagian Analisis Keuangan (Tidak berubah) --}}
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Analisis Keuangan</h3>
-            <div id="analysis-data-container" class="space-y-8"></div>
+            <div id="analysis-data-container" class="space-y-8">
+                {{-- Konten dimuat oleh JavaScript --}}
+            </div>
         </div>
     </div>
 
@@ -62,9 +101,10 @@
     <script src="https://cdn.jsdelivr.net/npm/date-fns@3.6.0/cdn.min.js"></script>
 
     <script>
-        // [PERBAIKAN KUNCI] Deklarasikan variabel chart di luar Alpine
+        // Deklarasikan variabel chart di luar Alpine
         let lineChart = null;
         let pieChart = null;
+        let mediaPieChart = null; 
 
         function analysisPage(todayDate, firstTransactionDate) {
             return {
@@ -77,10 +117,13 @@
                 activeClass: 'bg-blue-600 text-white border-blue-600 dark:bg-blue-500 dark:border-blue-500',
                 inactiveClass: 'bg-white text-gray-900 border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600',
                 
-                // initCharts akan dipanggil oleh x-init
+                activeSlide: 1,
+                totalSlides: 2, 
+                
                 initCharts() {
                     initLineChart();
                     initPieChart();
+                    initMediaPieChart(); 
                     this.updateLabel();
                     this.fetchData();
                 },
@@ -136,8 +179,28 @@
                             document.getElementById('summary-pemasukan').textContent = 'Rp ' + lifetime.summary.totalPemasukan;
                             document.getElementById('summary-pengeluaran').textContent = 'Rp ' + lifetime.summary.totalPengeluaran;
                             document.getElementById('summary-saldo').textContent = 'Rp ' + lifetime.summary.saldo;
+                            
                             pieChart.data.datasets[0].data = [lifetime.pieChart.pemasukan, lifetime.pieChart.pengeluaran];
                             pieChart.update();
+
+                            // [PERUBAHAN] Update Pie Chart Media dengan warna dari API
+                            if (lifetime.mediaPieChart && lifetime.mediaPieChart.data.length > 0) {
+                                mediaPieChart.data.labels = lifetime.mediaPieChart.labels;
+                                mediaPieChart.data.datasets[0].data = lifetime.mediaPieChart.data;
+                                // Terapkan warna dari API
+                                mediaPieChart.data.datasets[0].backgroundColor = lifetime.mediaPieChart.colors; 
+                                // Pastikan tooltip aktif
+                                mediaPieChart.options.plugins.tooltip.enabled = true;
+                                mediaPieChart.update();
+                            } else {
+                                // Tampilkan pesan jika tidak ada data media
+                                mediaPieChart.data.labels = ['Tidak ada data media'];
+                                mediaPieChart.data.datasets[0].data = [1];
+                                mediaPieChart.data.datasets[0].backgroundColor = ['rgba(200, 200, 200, 0.8)'];
+                                mediaPieChart.options.plugins.tooltip.enabled = false;
+                                mediaPieChart.update();
+                            }
+
                             if (lifetime.analysisData) {
                                 renderAnalysisData(lifetime.analysisData, analysisContainer);
                             }
@@ -196,19 +259,62 @@
             });
         }
 
+        // [PERUBAHAN] Fungsi initMediaPieChart
+        function initMediaPieChart() {
+            const mediaPieCtx = document.getElementById('mediaPieChart').getContext('2d');
+            mediaPieChart = new Chart(mediaPieCtx, {
+                type: 'pie',
+                data: { 
+                    labels: [], // Akan diisi dari API
+                    datasets: [{ 
+                        data: [], // Akan diisi dari API
+                        // Hapus daftar warna default, karena akan diisi oleh API
+                        backgroundColor: [], 
+                        borderColor: chartBorderColor, 
+                        borderWidth: 2 
+                    }] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { position: 'top', labels: { color: chartTextColor } },
+                        tooltip: { enabled: true }
+                    } 
+                }
+            });
+        }
+
+        // Fungsi renderAnalysisData (Tidak berubah)
         function renderAnalysisData(analysisData, container) {
-            container.innerHTML = '';
-            const groups = { ringkasanUmum: 'Ringkasan Umum', rasioPertumbuhan: 'Rasio & Pertumbuhan', analisisTransaksi: 'Analisis Transaksi', harianKonsistensi: 'Analisis Harian & Konsistensi' };
+            container.innerHTML = ''; 
+            const groups = { 
+                ringkasanUmum: 'Ringkasan Umum', 
+                rasioPertumbuhan: 'Rasio & Pertumbuhan', 
+                analisisTransaksi: 'Analisis Transaksi', 
+                harianKonsistensi: 'Analisis Harian & Konsistensi' 
+            };
+            
             for (const groupKey in groups) {
                 if (Object.hasOwnProperty.call(analysisData, groupKey)) {
                     const groupTitle = groups[groupKey];
                     const groupData = analysisData[groupKey];
-                    let groupHtml = `<div><h4 class="text-md font-bold text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 pb-2 mb-4">${groupTitle}</h4><div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-5">`;
+                    
+                    let groupHtml = `<div>
+                                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-4">${groupTitle}</h4>
+                                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">`; 
+
                     groupData.forEach(item => {
-                        groupHtml += `<div><p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">${item.label}</p><p class="text-sm sm:text-base font-bold text-gray-900 dark:text-white">${item.value}</p></div>`;
+                        groupHtml += `
+                        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                            <p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate" title="${item.label}">${item.label}</p>
+                            <p class="text-base sm:text-lg font-bold text-gray-900 dark:text-white">${item.value}</p>
+                        </div>
+                        `;
                     });
-                    groupHtml += `</div></div>`;
-                    container.innerHTML += groupHtml;
+
+                    groupHtml += `</div></div>`; 
+                    container.innerHTML += groupHtml; 
                 }
             }
         }
