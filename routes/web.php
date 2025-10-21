@@ -13,6 +13,7 @@ use App\Http\Controllers\personal\GrupController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\group\CatatanGroupController;
 use App\Http\Controllers\group\RencanaGroupController;
+use App\Http\Controllers\personal\UserProfileController;
 use App\Models\Grup;
 
 // Rute untuk Tamu (Guest) - Pengguna yang BELUM Login
@@ -70,6 +71,19 @@ Route::middleware('auth')->group(function () {
     Route::post('grup', [GrupController::class, 'store'])->name('grup.store');
     Route::get('grup/find', [GrupController::class, 'findGrupByCode'])->name('grup.find');
     Route::post('grup/join', [GrupController::class, 'join'])->name('grup.join');
+
+    Route::get('/profil', [UserProfileController::class, 'profile'])->name('profile.index');
+
+    Route::prefix('pengaturan')->name('settings.')->group(function() {
+        // Pengaturan Akun
+        Route::get('/akun', [UserProfileController::class, 'account'])->name('account.index');
+        Route::put('/akun', [UserProfileController::class, 'updateAccount'])->name('account.update'); // Update via PUT/PATCH
+        Route::post('/akun/send-otp', [UserProfileController::class, 'sendAccountOtp'])->name('account.send_otp'); // Kirim OTP
+
+        // Pengaturan Tampilan
+        Route::get('/tampilan', [UserProfileController::class, 'appearance'])->name('appearance.index');
+        // Route::put('/tampilan', [UserProfileController::class, 'updateAppearance'])->name('appearance.update'); // Jika perlu simpan ke backend
+    });
 
     Route::prefix('group/{grup}') // Menggunakan route model binding {grup}
         ->name('group.') // Nama route diawali 'grup.' (cth: grup.catatan.index)

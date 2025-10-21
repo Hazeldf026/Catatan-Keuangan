@@ -85,8 +85,8 @@
                             
                             {{-- Bagian Menu Link --}}
                             <div class="py-1" role="none">
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600" role="menuitem" tabindex="-1">Profil</a>
-                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600" role="menuitem" tabindex="-1">Pengaturan</a>
+                                <a href="{{ route('profile.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600" role="menuitem" tabindex="-1">Profil</a>
+                                <a href="{{ route('settings.account.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-slate-600" role="menuitem" tabindex="-1">Pengaturan</a>
                                 <button type="button" 
                                     @click="$dispatch('open-logout-modal')" 
                                     class="flex items-center gap-1 w-full px-4 py-2 text-sm text-left text-red-500 hover:bg-red-100/60 dark:hover:bg-red-600/20" 

@@ -10,6 +10,25 @@
     <style>
     [x-cloak] { display: none !important; }
     </style>
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme');
+            const html = document.documentElement;
+            
+            if (theme === 'dark') {
+                html.classList.add('dark');
+            } else if (theme === 'light') {
+                html.classList.remove('dark');
+            } else {
+                // Default sistem
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+            }
+        })();
+    </script>
 </head>
 <body 
     x-data="{ logoutModalOpen: false }" 
