@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -58,5 +59,15 @@ class User extends Authenticatable
     public function rencanas(): HasMany
     {
         return $this->hasMany(Rencana::class);
+    }
+
+    public function grups(): BelongsToMany
+    {
+        return $this->belongsToMany(Grup::class, 'grup_user');
+    }
+    
+    public function ownedGrups(): HasMany
+    {
+        return $this->hasMany(Grup::class, 'user_id');
     }
 }

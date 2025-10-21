@@ -11,6 +11,7 @@ use App\Http\Controllers\ResetPasswordController;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GrupController;
 
 // Rute untuk Tamu (Guest) - Pengguna yang BELUM Login
 Route::middleware('guest')->group(function () {
@@ -62,4 +63,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('rencana', RencanaController::class);
     Route::post('rencana/{rencana}/cancel', [RencanaController::class, 'cancel'])->name('rencana.cancel');
     Route::post('rencana/{rencana}/toggle-pin', [RencanaController::class, 'togglePin'])->name('rencana.togglePin');
+
+    Route::get('grup', [GrupController::class, 'index'])->name('grup.index');
+    Route::post('grup', [GrupController::class, 'store'])->name('grup.store');
+    Route::post('grup/join', [GrupController::class, 'join'])->name('grup.join');
 });
