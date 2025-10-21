@@ -20,6 +20,14 @@ class Rencana extends Model
         'jumlah_terkumpul',
         'target_tanggal',
         'status',
+        'is_pinned',
+    ];
+
+    protected $casts = [
+        'is_pinned' => 'boolean',
+        'target_tanggal' => 'date',
+        'target_jumlah' => 'decimal:2',
+        'jumlah_terkumpul' => 'decimal:2',
     ];
 
     public function user(): BelongsTo

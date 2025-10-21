@@ -20,20 +20,17 @@ class RencanaFactory extends Factory
      */
     public function definition(): array
     {
-        $target = $this->faker->numberBetween(1000000, 20000000);
-        $terkumpul = $this->faker->numberBetween(0, $target);
-        $status = ($terkumpul >= $target) ? 'selesai' : 'berjalan';
-
         return [
-            // Pilih user secara acak dari yang sudah ada
-            'user_id' => User::inRandomOrder()->first()->id,
+            'user_id' => User::inRandomOrder()->first()->id ?? User::factory(),
             'nama' => $this->faker->sentence(3),
-            'deskripsi' => $this->faker->paragraph(2),
-            'target_jumlah' => $this->faker->numberBetween(1000000, 20000000),
-            'jumlah_terkumpul' => 0,
-            'status' => 'berjalan', // Selalu 'berjalan' saat dibuat
+            'deskripsi' => $this->faker->paragraph(1),
+            'target_jumlah' => $this->faker->randomElement([1000000, 5000000, 10000000, 20000000]),
             
-            'target_tanggal' => $this->faker->dateTimeBetween('+1 month', '+1 year'),
+            // PERUBAHAN: Selalu mulai dari nol
+            'jumlah_terkumpul' => 0,
+            'status' => 'berjalan',
+            
+            'target_tanggal' => $this->faker->dateTimeBetween('+2 months', '+2 years'),
         ];
     }
 }

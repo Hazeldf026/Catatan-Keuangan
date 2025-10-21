@@ -16,6 +16,7 @@ class Catatan extends Model
         'category_id', 
         'alokasi',
         'rencana_id',
+        'media',
         'custom_category', 
         'deskripsi', 
         'jumlah'

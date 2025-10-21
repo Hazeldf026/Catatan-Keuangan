@@ -3,7 +3,8 @@
         Detail Rencana: {{ $rencana->nama }}
     </x-slot:title>
 
-    <div x-data="{ deleteModalOpen: false, deleteAction: '' }" class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div x-data="{ deleteModalOpen: false, deleteAction: '', cancelModalOpen: false, cancelAction: '' }" 
+        class="container mx-auto p-4 sm:p-6 lg:p-8">
         {{-- Wrapper untuk Efek Pudar/Non-aktif saat Dibatalkan --}}
         <div class="{{ $rencana->status === 'dibatalkan' ? 'opacity-60' : '' }}">
 
@@ -22,13 +23,39 @@
                     <div class="flex space-x-2">
                         {{-- Tombol Edit & Batalkan hanya muncul jika status BUKAN 'dibatalkan' --}}
                         @if ($rencana->status !== 'dibatalkan')
+                            {{-- Tombol Pin/Unpin --}}
+                            <form action="{{ route('rencana.togglePin', $rencana) }}" method="POST">
+                                @csrf
+                                {{-- PERBAIKAN: Ganti teks dengan ikon, warna tetap abu-abu --}}
+                                <button type="submit" 
+                                        class="p-2 text-sm font-medium rounded-lg 
+                                            bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 
+                                            text-gray-700 dark:text-gray-200"
+                                        title="{{ $rencana->is_pinned ? 'Lepas Pin' : 'Pin Rencana' }}">
+                                    @if ($rencana->is_pinned)
+                                        {{-- Ikon Unpin (Outline) --}}
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke-width="1.5" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.25 4.75v5.5m1.5 0v-5.5M8.01 6.33h3.98M4.75 11.75h10.5M6.25 14.75h7.5M8 17.75h4M5.75 11.75a4.5 4.5 0 00-1.037 3.394v2.606a.75.75 0 00.75.75h9.074a.75.75 0 00.75-.75v-2.606a4.5 4.5 0 00-1.037-3.394" />
+                                        </svg> 
+                                    @else
+                                        {{-- Ikon Pin (Solid) --}}
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10 3.75a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0v-5.5a.75.75 0 01.75-.75z" />
+                                        <path fill-rule="evenodd" d="M8.01 6.33a.75.75 0 01.75-.75h2.48a.75.75 0 01.75.75v.005l.001.002.007.005.011.008a6.002 6.002 0 013.987 5.093l.002.012.002.016.002.019v2.234a.75.75 0 11-1.5 0v-2.18a4.502 4.502 0 00-4.01-4.474l-.011-.003-.01-.002-.014-.003h-1.954a4.502 4.502 0 00-4.01 4.474l-.011.003-.01.002-.014.003v2.18a.75.75 0 11-1.5 0V11.75l.002-.02.002-.016.002-.011a6.001 6.001 0 013.987-5.093l.011-.008.007-.005.001-.002V6.33z" clip-rule="evenodd" />
+                                        </svg>
+                                    @endif
+                                </button>
+                            </form>
+
                             <a href="{{ route('rencana.edit', $rencana) }}" class="px-4 py-2 text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 rounded-lg">Edit</a>
                             
                             @if ($rencana->status === 'berjalan')
-                            <form action="{{ route('rencana.cancel', $rencana) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan rencana ini? Dana yang terkumpul tidak akan dikembalikan.');">
-                                @csrf
-                                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-lg">Batalkan</button>
-                            </form>
+                            {{-- Ganti <form> dengan <button> pemicu Alpine --}}
+                            <button type="button" 
+                                    @click="cancelAction = '{{ route('rencana.cancel', $rencana) }}'; cancelModalOpen = true" 
+                                    class="px-4 py-2 text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-lg">
+                                Batalkan
+                            </button>
                             @endif
                         @endif
 
@@ -119,5 +146,10 @@
         <x-delete-confirmation title="Konfirmasi Hapus Rencana">
             Apakah Anda yakin ingin menghapus rencana ini secara permanen? Semua catatan terkait tidak akan ikut terhapus.
         </x-delete-confirmation>
+
+        <x-cancel-confirmation>
+            Apakah Anda yakin ingin membatalkan rencana ini? Status akan diubah menjadi "Dibatalkan" dan tidak bisa diubah kembali. Dana yang terkumpul tidak akan dikembalikan.
+        </x-cancel-confirmation>
+
     </div>
 </x-layout>

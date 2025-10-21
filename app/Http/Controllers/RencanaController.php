@@ -15,7 +15,9 @@ class RencanaController extends Controller
     public function index(Request $request)
     {
          // Query dasar untuk mengambil rencana milik user
-        $query = Rencana::where('user_id', Auth::id());
+        $query = Rencana::where('user_id', Auth::id())
+                    ->orderBy('is_pinned', 'desc') 
+                    ->orderBy('created_at', 'desc');
 
         // 1. Logika untuk FILTER berdasarkan status
         if ($request->has('status') && in_array($request->status, ['berjalan', 'selesai', 'dibatalkan'])) {
@@ -154,5 +156,18 @@ class RencanaController extends Controller
         }
 
         return redirect()->route('rencana.show', $rencana)->with('success', 'Rencana telah dibatalkan.');
+    }
+
+    public function togglePin(Rencana $rencana)
+    {
+        // Pastikan milik user dan tidak dibatalkan
+        abort_if($rencana->user_id !== Auth::id() || $rencana->status === 'dibatalkan', 403);
+
+        // Toggle status pin
+        $rencana->update(['is_pinned' => !$rencana->is_pinned]);
+
+        $message = $rencana->is_pinned ? 'Rencana berhasil di-pin!' : 'Pin rencana berhasil dilepas.';
+
+        return redirect()->back()->with('success', $message);
     }
 }

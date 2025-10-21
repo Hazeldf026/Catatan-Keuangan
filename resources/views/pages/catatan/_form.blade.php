@@ -55,28 +55,33 @@
         @enderror
     </div>
 
-    {{-- =================================== --}}
-    {{-- == BAGIAN ALOKASI YANG DIPERBARUI == --}}
-    {{-- =================================== --}}
-    <div class="mb-5" x-show="tipe" x-cloak>
-        <label for="alokasi" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Alokasi Dana (Opsional)</label>
+    {{-- Input Alokasi (Hanya muncul untuk Pemasukan) --}}
+    <div class="mb-5" x-show="tipe === 'pemasukan'" x-cloak>
+        <label for="alokasi" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Alokasikan Ke</label>
         <select id="alokasi" name="alokasi" x-model="alokasi" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-            <option value="">Tidak Dialokasikan</option>
-            
-            {{-- Opsi ini hanya muncul jika tipe adalah Pemasukan --}}
-            <template x-if="tipe === 'pemasukan'">
-                <option value="rencana">Masukkan ke Rencana</option>
-            </template>
-            
-            {{-- Opsi ini akan datang di masa depan --}}
-            {{-- <option value="media">Alokasikan ke Media</option> --}}
+            <option value="">Pilih Alokasi</option>
+            <option value="media">Media Penyimpanan</option>
+            <option value="rencana">Rencana Tabungan</option>
         </select>
     </div>
 
-    {{-- Pilihan Rencana (Hanya Muncul Jika Tipe Pemasukan & Alokasi = Rencana) --}}
+    {{-- Input Select Media (Muncul saat Pengeluaran, atau saat Pemasukan dialokasikan ke Media) --}}
+    <div class="mb-5" x-show="tipe === 'pengeluaran' || (tipe === 'pemasukan' && alokasi === 'media')" x-cloak>
+        <label for="media" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Media Penyimpanan</label>
+        <select name="media" id="media" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+            <option value="">Pilih Media</option>
+            <option value="wallet" @selected(old('media', $catatan->media) == 'wallet')>Wallet</option>
+            <option value="bank" @selected(old('media', $catatan->media) == 'bank')>Bank</option>
+            <option value="e-wallet" @selected(old('media', $catatan->media) == 'e-wallet')>E-Wallet</option>
+            <option value="tabungan" @selected(old('media', $catatan->media) == 'tabungan')>Tabungan</option>
+        </select>
+        @error('media') <p class="mt-2 text-sm text-red-500">{{ $message }}</p> @enderror
+    </div>
+
+    {{-- Pilihan Rencana (Hanya Muncul Jika Pemasukan dialokasikan ke Rencana) --}}
     <div class="mb-5" x-show="tipe === 'pemasukan' && alokasi === 'rencana'" x-cloak>
         <label for="rencana_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih Rencana</label>
-        <select name="rencana_id" id="rencana_id" :required="alokasi === 'rencana'" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+        <select name="rencana_id" id="rencana_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
             <option value="">Pilih salah satu rencanamu</option>
             @foreach ($rencanas as $rencana)
                 <option value="{{ $rencana->id }}" @selected(old('rencana_id', $catatan->rencana_id) == $rencana->id)>
@@ -106,10 +111,25 @@
         @enderror
     </div>
 
-    {{-- Submit --}}
-    <div class="flex items-center justify-end">
-        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-            Simpan
+    {{-- Submit dan Batal --}}
+    <div class="mt-6 flex justify-end space-x-3"> {{-- Tambahkan margin atas dan spacing --}}
+        
+        {{-- Tombol Batal --}}
+        @if($method === 'PUT')
+            {{-- Saat Edit, kembali ke halaman index --}}
+            <a href="{{ route('catatan.index') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-600">
+                Batal
+            </a>
+        @else
+            {{-- Saat Create, kembali ke halaman index --}}
+            <a href="{{ route('catatan.index') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:bg-gray-600">
+                Batal
+            </a>
+        @endif
+
+        {{-- Tombol Simpan/Update --}}
+        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            {{ $method === 'PUT' ? 'Update Catatan' : 'Simpan Catatan' }} {{-- Ubah teks tombol --}}
         </button>
     </div>
 </form>

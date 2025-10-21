@@ -61,4 +61,5 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('rencana', RencanaController::class);
     Route::post('rencana/{rencana}/cancel', [RencanaController::class, 'cancel'])->name('rencana.cancel');
+    Route::post('rencana/{rencana}/toggle-pin', [RencanaController::class, 'togglePin'])->name('rencana.togglePin');
 });

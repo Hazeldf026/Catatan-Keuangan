@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('catatans', function (Blueprint $table) {
-            $table->enum('alokasi', ['rencana', 'media'])->nullable()->after('category_id');
-            $table->foreignId('rencana_id')->nullable()->after('category_id')->constrained('rencanas')->nullOnDelete();
+            $table->enum('media', ['wallet', 'bank', 'e-wallet', 'tabungan'])
+                ->after('rencana_id')
+                ->nullable();
         });
     }
 
@@ -23,10 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('catatans', function (Blueprint $table) {
-            // Drop foreign key constraint first
-            $table->dropForeign(['rencana_id']);
-            // Then drop the column
-            $table->dropColumn(['alokasi', 'rencana_id']);
+            $table->dropColumn('media');
         });
     }
 };

@@ -72,9 +72,20 @@
                     @foreach ($rencanas as $rencana)
                         {{-- Kartu Rencana Individual dengan background abu-abu --}}
                         <a href="{{ route('rencana.show', $rencana) }}" 
-                            class="group block p-5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:ring-2 hover:ring-blue-500 transition-all duration-200 {{ $rencana->status === 'dibatalkan' ? 'opacity-60' : '' }}">
+                            class="relative group block p-5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:ring-2 hover:ring-blue-500 transition-all duration-200 {{ $rencana->status === 'dibatalkan' ? 'opacity-60' : '' }}">
                             
-                            <div class="flex justify-between items-start mb-3">
+                            @if($rencana->is_pinned)
+                            <div class="absolute top-2 left-2 flex items-center text-xs text-blue-800 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 rounded-full z-10">
+                                {{-- Ikon Pin Kecil --}}
+                                <svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 3.75a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0v-5.5a.75.75 0 01.75-.75z" />
+                                <path fill-rule="evenodd" d="M8.01 6.33a.75.75 0 01.75-.75h2.48a.75.75 0 01.75.75v.005l.001.002.007.005.011.008a6.002 6.002 0 013.987 5.093l.002.012.002.016.002.019v2.234a.75.75 0 11-1.5 0v-2.18a4.502 4.502 0 00-4.01-4.474l-.011-.003-.01-.002-.014-.003h-1.954a4.502 4.502 0 00-4.01 4.474l-.011.003-.01.002-.014.003v2.18a.75.75 0 11-1.5 0V11.75l.002-.02.002-.016.002-.011a6.001 6.001 0 013.987-5.093l.011-.008.007-.005.001-.002V6.33z" clip-rule="evenodd" />
+                                </svg>
+                                <span>Di Pin</span>
+                            </div>
+                            @endif
+
+                            <div class="flex justify-between items-start mb-3 {{ $rencana->is_pinned ? 'pt-5' : '' }}">
                                 <h5 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ $rencana->nama }}</h5>
                                 @php
                                     $statusClass = match($rencana->status) {

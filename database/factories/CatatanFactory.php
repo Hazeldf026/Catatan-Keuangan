@@ -21,11 +21,15 @@ class CatatanFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::inRandomOrder()->first()->id,
-            'category_id' => Category::inRandomOrder()->first()->id,
-            'custom_category' => fake()->words(2, true),
-            'deskripsi' => fake()->sentence(),
-            'jumlah' => fake()->numberBetween(10000, 1000000),
+            'user_id' => User::factory(),
+            'category_id' => Category::factory(),
+            'deskripsi' => $this->faker->sentence(),
+            'jumlah' => $this->faker->numberBetween(10000, 500000),
+            
+            // PERUBAHAN BARU: Menambahkan default untuk kolom baru
+            'alokasi' => null, 
+            'rencana_id' => null,
+            'media' => $this->faker->randomElement(['wallet', 'bank', 'e-wallet', 'tabungan']),
         ];
     }
 
