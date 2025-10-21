@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Catatan;
 use App\Models\Category;
@@ -92,7 +93,7 @@ class CatatanController extends Controller
 
 
         // --- KIRIM SEMUA DATA BARU KE VIEW ---
-        return view('pages.catatan.index', compact(
+        return view('personal::catatan.index', compact(
             'catatans', 
             'saldoAkhir', 
             'totalPemasukan', 
@@ -111,12 +112,12 @@ class CatatanController extends Controller
     {
         $categories = Category::orderBy('tipe')->get();
         $rencanas = Rencana::where('user_id', Auth::id())->where('status', 'berjalan')->get();
-        return view('pages.catatan.create', compact('categories', 'rencanas'));
+        return view('personal::catatan.create', compact('categories', 'rencanas'));
     }
     
     public function show(Catatan $catatan)
     {
-        return view('pages.catatan.show', compact('catatan'));
+        return view('personal::catatan.show', compact('catatan'));
     }
 
     // --- KODE BARU UNTUK STORE ---
@@ -188,7 +189,7 @@ class CatatanController extends Controller
                          ->orWhere('id', $catatan->rencana_id) // Pastikan rencana lama tetap ada di list
                          ->get();
                          
-        return view('pages.catatan.edit', compact('catatan', 'categories', 'rencanas'));
+        return view('personal::catatan.edit', compact('catatan', 'categories', 'rencanas'));
     }
 
     // --- KODE BARU UNTUK UPDATE ---

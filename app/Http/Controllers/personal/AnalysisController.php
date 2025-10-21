@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use App\Models\Catatan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
 
 class AnalysisController extends Controller
 {
@@ -15,7 +17,7 @@ class AnalysisController extends Controller
         $userId = Auth::id();
         $firstTransactionDate = Catatan::where('user_id', $userId)->min('created_at');
 
-        return view('pages.analysis', [
+        return view('personal::analysis', [
             'todayDate' => Carbon::now()->toDateString(),
             'firstTransactionDate' => $firstTransactionDate ? Carbon::parse($firstTransactionDate)->toDateString() : null,
         ]);

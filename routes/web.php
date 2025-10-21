@@ -1,17 +1,15 @@
 <?php
 
-use App\Http\Controllers\AnalysisController;
-use App\Http\Controllers\CatatanController;
-use App\Http\Controllers\ForgotPasswordController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\OtpVerificationController;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\RencanaController;
-use App\Http\Controllers\ResetPasswordController;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\personal\AnalysisController;
+use App\Http\Controllers\personal\CatatanController;
+use App\Http\Controllers\personal\ForgotPasswordController;
+use App\Http\Controllers\personal\LoginController;
+use App\Http\Controllers\personal\OtpVerificationController;
+use App\Http\Controllers\personal\RegisterController;
+use App\Http\Controllers\personal\RencanaController;
+use App\Http\Controllers\personal\ResetPasswordController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\GrupController;
+use App\Http\Controllers\personal\GrupController;
 
 // Rute untuk Tamu (Guest) - Pengguna yang BELUM Login
 Route::middleware('guest')->group(function () {

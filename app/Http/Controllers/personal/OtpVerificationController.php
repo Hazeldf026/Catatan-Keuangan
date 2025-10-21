@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use App\Mail\SendOtpMail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class OtpVerificationController extends Controller
         if (!$email) {
             return redirect()->route('register');
         }
-        return view('pages.auth.verify-otp', ['email' => $email]);
+        return view('personal::auth.verify-otp', ['email' => $email]);
     }
 
     public function verify(Request $request)

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use App\Models\Grup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class GrupController extends Controller
         // Ambil grup yang diikuti user, dan eager load data 'users' untuk menghitung anggota
         $grups = $user->grups()->with('users')->get();
         
-        return view('pages.grup.index', compact('grups'));
+        return view('personal::grup.index', compact('grups'));
     }
 
     /**

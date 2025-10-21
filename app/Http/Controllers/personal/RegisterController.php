@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use App\Mail\SendOtpMail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ class RegisterController extends Controller
 {
     public function showRegisterForm() 
     {
-        return view('pages.register');
+        return view('personal::auth.register');
     }
 
     public function register(Request $request) 

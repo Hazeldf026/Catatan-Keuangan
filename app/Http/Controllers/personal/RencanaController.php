@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use App\Models\Rencana;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,7 +51,7 @@ class RencanaController extends Controller
         $rencanas = $query->paginate(9)->withQueryString();
 
         // Kirim data ke view
-        return view('pages.rencana.index', compact('rencanas'));
+        return view('personal::rencana.index', compact('rencanas'));
     }
 
     /**
@@ -59,7 +60,7 @@ class RencanaController extends Controller
     public function create()
     {
         // Tampilkan halaman form untuk membuat rencana baru
-        return view('pages.rencana.create');
+        return view('personal::rencana.create');
     }
 
     /**
@@ -94,7 +95,7 @@ class RencanaController extends Controller
         $catatans = $rencana->catatans()->latest()->paginate(10);
 
         // Tampilkan halaman detail rencana
-        return view('pages.rencana.show', compact('rencana', 'catatans'));
+        return view('personal::rencana.show', compact('rencana', 'catatans'));
     }
 
     /**
@@ -106,7 +107,7 @@ class RencanaController extends Controller
         abort_if($rencana->user_id !== Auth::id(), 403);
 
         // Tampilkan halaman form edit
-        return view('pages.rencana.edit', compact('rencana'));
+        return view('personal::rencana.edit', compact('rencana'));
     }
 
     /**

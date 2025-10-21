@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,7 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        return view('pages.login');
+        return view('personal::auth.login');
     }
 
     public function login(Request $request)

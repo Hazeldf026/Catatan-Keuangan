@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\personal;
 
+use App\Http\Controllers\Controller;
 use App\Mail\SendOtpMail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class ForgotPasswordController extends Controller
 {
     public function showForgotPasswordForm() 
     {
-        return view('pages.forgot-password');
+        return view('personal::auth.forgot-password');
     }
 
     public function sendOtp(Request $request)
@@ -44,7 +45,7 @@ class ForgotPasswordController extends Controller
         if (!$email) {
             return redirect()->route('password.request')->withErrors(['email' => 'Silakan masukkan email Anda terlebih dahulu.']);
         }
-        return view('pages.auth.verify-password-otp', ['email' => $email]);
+        return view('personal::auth.verify-password-otp', ['email' => $email]);
     }
 
     public function verifyOtp(Request $request)
