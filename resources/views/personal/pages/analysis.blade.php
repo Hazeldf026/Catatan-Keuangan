@@ -3,7 +3,6 @@
         Analisis | Credix
     </x-slot:title>
 
-    {{-- Komponen utama Alpine.js --}}
     <div 
         x-data="analysisPage(
             '{{ $todayDate }}', 
@@ -12,7 +11,7 @@
         x-init="initCharts()"
         class="container mx-auto p-4 sm:p-6 lg:p-8">
 
-        {{-- Kartu Ringkasan (Tidak berubah) --}}
+        {{-- Kartu Ringkasan --}}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
                 <div class="bg-green-100 dark:bg-green-900 p-3 rounded-full"><svg class="w-6 h-6 text-green-600 dark:text-green-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1M2 5h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg></div>
@@ -24,12 +23,12 @@
             </div>
             <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
                 <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full"><svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
-                <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Saat Ini</h4><p id="summary-saldo" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
+                <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Saldo</h4><p id="summary-saldo" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
             </div>
         </div>
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            {{-- Line Chart (Tidak berubah) --}}
+            {{-- Line Chart --}}
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
                     <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Tren Keuangan</h3>
@@ -47,12 +46,12 @@
                 <div class="h-64"><canvas id="lineChart"></canvas></div>
             </div>
 
-            {{-- Kartu Pie Chart Carousel (Tidak berubah) --}}
+            {{-- Kartu Pie Chart Carousel --}}
             <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md relative overflow-hidden">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                         <span x-show="activeSlide === 1" x-transition>Komposisi Keuangan</span>
-                        <span x-show="activeSlide === 2" x-transition x-cloak>Komposisi Media (Pengeluaran)</span>
+                        <span x-show="activeSlide === 2" x-transition x-cloak>Komposisi Media</span>
                     </h3>
                 </div>
 
@@ -86,7 +85,7 @@
             </div>
         </div>
 
-        {{-- Bagian Analisis Keuangan (Tidak berubah) --}}
+        {{-- Bagian Analisis Keuangan --}}
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
             <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Analisis Keuangan</h3>
             <div id="analysis-data-container" class="space-y-8">
@@ -164,10 +163,10 @@
                     try {
                         const analysisContainer = document.getElementById('analysis-data-container');
                         if (!this.lifetimeDataLoaded) {
-                           document.getElementById('summary-pemasukan').textContent = 'Memuat...';
-                           document.getElementById('summary-pengeluaran').textContent = 'Memuat...';
-                           document.getElementById('summary-saldo').textContent = 'Memuat...';
-                           analysisContainer.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">Memuat data analisis...</div>';
+                            document.getElementById('summary-pemasukan').textContent = 'Memuat...';
+                            document.getElementById('summary-pengeluaran').textContent = 'Memuat...';
+                            document.getElementById('summary-saldo').textContent = 'Memuat...';
+                            analysisContainer.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">Memuat data analisis...</div>';
                         }
                         
                         const response = await fetch(`{{ route('analysis.data') }}?scale=${this.activeScale}&date=${this.currentDate}`);
@@ -183,17 +182,13 @@
                             pieChart.data.datasets[0].data = [lifetime.pieChart.pemasukan, lifetime.pieChart.pengeluaran];
                             pieChart.update();
 
-                            // [PERUBAHAN] Update Pie Chart Media dengan warna dari API
                             if (lifetime.mediaPieChart && lifetime.mediaPieChart.data.length > 0) {
                                 mediaPieChart.data.labels = lifetime.mediaPieChart.labels;
                                 mediaPieChart.data.datasets[0].data = lifetime.mediaPieChart.data;
-                                // Terapkan warna dari API
                                 mediaPieChart.data.datasets[0].backgroundColor = lifetime.mediaPieChart.colors; 
-                                // Pastikan tooltip aktif
                                 mediaPieChart.options.plugins.tooltip.enabled = true;
                                 mediaPieChart.update();
                             } else {
-                                // Tampilkan pesan jika tidak ada data media
                                 mediaPieChart.data.labels = ['Tidak ada data media'];
                                 mediaPieChart.data.datasets[0].data = [1];
                                 mediaPieChart.data.datasets[0].backgroundColor = ['rgba(200, 200, 200, 0.8)'];
@@ -238,8 +233,8 @@
         }
 
         // --- FUNGSI-FUNGSI HELPER DI LUAR ALPINE ---
-        const chartTextColor = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
-        const chartBorderColor = window.matchMedia('(prefers-color-scheme: dark)').matches ? '#1f2937' : '#ffffff';
+        const chartTextColor = document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'; 
+        const chartBorderColor = document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff';
 
         function initLineChart() {
             const lineCtx = document.getElementById('lineChart').getContext('2d');
@@ -259,16 +254,14 @@
             });
         }
 
-        // [PERUBAHAN] Fungsi initMediaPieChart
         function initMediaPieChart() {
             const mediaPieCtx = document.getElementById('mediaPieChart').getContext('2d');
             mediaPieChart = new Chart(mediaPieCtx, {
                 type: 'pie',
                 data: { 
-                    labels: [], // Akan diisi dari API
+                    labels: [],
                     datasets: [{ 
-                        data: [], // Akan diisi dari API
-                        // Hapus daftar warna default, karena akan diisi oleh API
+                        data: [], 
                         backgroundColor: [], 
                         borderColor: chartBorderColor, 
                         borderWidth: 2 
@@ -285,7 +278,7 @@
             });
         }
 
-        // Fungsi renderAnalysisData (Tidak berubah)
+        // Fungsi renderAnalysisData
         function renderAnalysisData(analysisData, container) {
             container.innerHTML = ''; 
             const groups = { 

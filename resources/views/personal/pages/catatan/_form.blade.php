@@ -59,7 +59,7 @@
     <div class="mb-5" x-show="tipe === 'pemasukan'" x-cloak>
         <label for="alokasi" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Alokasikan Ke</label>
         <select id="alokasi" name="alokasi" x-model="alokasi" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-            <option value="">Pilih Alokasi</option>
+            <option value="" disabled selected hidden>Pilih Alokasi</option>
             <option value="media">Media Penyimpanan</option>
             <option value="rencana">Rencana Tabungan</option>
         </select>
@@ -69,7 +69,7 @@
     <div class="mb-5" x-show="tipe === 'pengeluaran' || (tipe === 'pemasukan' && alokasi === 'media')" x-cloak>
         <label for="media" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Media Penyimpanan</label>
         <select name="media" id="media" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-            <option value="">Pilih Media</option>
+            <option value="" disabled selected hidden>Pilih Media</option>
             <option value="wallet" @selected(old('media', $catatan->media) == 'wallet')>Wallet</option>
             <option value="bank" @selected(old('media', $catatan->media) == 'bank')>Bank</option>
             <option value="e-wallet" @selected(old('media', $catatan->media) == 'e-wallet')>E-Wallet</option>
@@ -82,7 +82,7 @@
     <div class="mb-5" x-show="tipe === 'pemasukan' && alokasi === 'rencana'" x-cloak>
         <label for="rencana_id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pilih Rencana</label>
         <select name="rencana_id" id="rencana_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-            <option value="">Pilih salah satu rencanamu</option>
+            <option value="" disabled selected hidden>Pilih salah satu rencanamu</option>
             @foreach ($rencanas as $rencana)
                 <option value="{{ $rencana->id }}" @selected(old('rencana_id', $catatan->rencana_id) == $rencana->id)>
                     {{ $rencana->nama }}

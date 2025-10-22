@@ -30,11 +30,7 @@ class AnalysisController extends Controller
         $date = $request->input('date', Carbon::now()->toDateString());
         $targetDate = Carbon::parse($date);
 
-        // =================================================================
-        // BAGIAN 1: PERHITUNGAN DATA LIFETIME & ANALISIS
-        // =================================================================
-        
-        // Kueri Pemasukan/Pengeluaran (tetap sama)
+        // Kueri Pemasukan/Pengeluaran 
         $lifetimePemasukanQuery = Catatan::where('user_id', $userId)
             ->whereHas('category', fn ($q) => $q->where('tipe', 'pemasukan'));
         $lifetimePengeluaranQuery = Catatan::where('user_id', $userId)
@@ -42,9 +38,6 @@ class AnalysisController extends Controller
         $totalPemasukanLifetime = (clone $lifetimePemasukanQuery)->sum('jumlah');
         $totalPengeluaranLifetime = (clone $lifetimePengeluaranQuery)->sum('jumlah');
 
-        // --- [PERBAIKAN TOTAL UNTUK MEDIA CHART] ---
-
-        // 1. Definisikan peta warna (HANYA 4 media, sesuai permintaanmu)
         $mediaColorMap = [
             'wallet'     => 'rgba(249, 115, 22, 0.8)',  // orange-500
             'bank'       => 'rgba(139, 92, 246, 0.8)',  // violet-500 (ungu)
@@ -52,38 +45,28 @@ class AnalysisController extends Controller
             'tabungan'   => 'rgba(234, 179, 8, 0.8)',   // yellow-500 (kuning)
         ];
         
-        // 2. Ambil data SALDO per media dari database
+        // data SALDO per media dari database
         $mediaBalances = Catatan::where('catatans.user_id', $userId)
             ->whereNotNull('media')
             ->join('categories', 'catatans.category_id', '=', 'categories.id')
-            // [PERBAIKAN 1] Paksa media menjadi lowercase di level SQL
             ->groupBy(DB::raw('LOWER(media)')) 
             ->select(
-                DB::raw('LOWER(media) as media'), // [PERBAIKAN 1]
+                DB::raw('LOWER(media) as media'),
                 DB::raw('SUM(CASE WHEN categories.tipe = "pemasukan" THEN catatans.jumlah ELSE -catatans.jumlah END) as total')
             )
             ->orderBy('total', 'desc')
             ->get();
         
-        // [PERBAIKAN 2] Hapus filter positive balance agar 'e-wallet' dan 'tabungan' (jika 0) tetap ada.
-        // $positiveMediaBalances = $mediaBalances->filter(fn ($item) => $item->total > 0);
-        // Kita pakai $mediaBalances langsung
-
-        // 3. Proses data media
         $mediaPieChartLabels = $mediaBalances->pluck('media');
         
-        // 4. Proses data (jika total < 0, jadikan 0 untuk chart)
         $mediaPieChartData = $mediaBalances->map(fn ($item) => $item->total > 0 ? $item->total : 0);
         
-        // 5. Proses warna
         $mediaPieChartColors = $mediaBalances->map(fn ($item) =>
-            // [PERBAIKAN 3] Key dijamin lowercase oleh SQL. Hapus 'Lainnya'.
-            $mediaColorMap[$item->media] ?? 'rgba(156, 163, 175, 0.8)' // Fallback abu-abu jika ada data media aneh
+            $mediaColorMap[$item->media] ?? 'rgba(156, 163, 175, 0.8)'
         );
         
-        // --- Akhir Perbaikan Media Chart ---
 
-        // Kueri sisa untuk data analisis (tetap sama)
+        // Kueri sisa untuk data analisis 
         $incomesLifetime = (clone $lifetimePemasukanQuery)->get();
         $expensesLifetime = (clone $lifetimePengeluaranQuery)->get();
         $prevMonthStartDate = Carbon::now()->subMonth()->startOfMonth();
@@ -94,15 +77,8 @@ class AnalysisController extends Controller
         $daysInPeriodLifetime = $firstTransactionDate ? Carbon::parse($firstTransactionDate)->diffInDays(Carbon::now()) + 1 : 1;
         
         $analysisData = $this->calculateAnalysisData($totalPemasukanLifetime, $totalPengeluaranLifetime, $incomesLifetime, $expensesLifetime, $lastPeriodIncomes, $lastPeriodExpenses, $daysInPeriodLifetime);
-
-        // =================================================================
-        // BAGIAN 2: PERHITUNGAN DATA LINE CHART (Tetap sama)
-        // =================================================================
         $lineChartData = $this->generateLineChartData($userId, $scale, $targetDate);
 
-        // =================================================================
-        // BAGIAN 3: MENGIRIM SEMUA DATA DALAM FORMAT JSON
-        // =================================================================
         return response()->json([
             'lifetimeData' => [
                 'summary' => [
@@ -124,8 +100,6 @@ class AnalysisController extends Controller
             'lineChartData' => $lineChartData,
         ]);
     }
-
-    // ... (Sisa file, semua fungsi helper di bawah ini tetap sama) ...
 
     private function generateLineChartData($userId, $scale, Carbon $targetDate)
     {

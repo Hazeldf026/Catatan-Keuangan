@@ -11,21 +11,16 @@ use Illuminate\Validation\Rule;
 
 class GrupController extends Controller
 {
-    /**
-     * Menampilkan halaman daftar grup yang diikuti user.
-     */
+
     public function index()
     {
         $user = Auth::user();
-        // Ambil grup yang diikuti user, dan eager load data 'users' untuk menghitung anggota
         $grups = $user->grups()->with('users')->get();
         
         return view('personal::grup.index', compact('grups'));
     }
 
-    /**
-     * Menyimpan grup baru yang dibuat.
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -40,10 +35,9 @@ class GrupController extends Controller
             'user_id' => $user->id,
             'nama' => $request->nama,
             'deskripsi' => $request->deskripsi,
-            'grup_code' => $this->generateUniqueCode(), // Panggil fungsi helper
+            'grup_code' => $this->generateUniqueCode(), 
         ]);
 
-        // Secara otomatis masukkan pembuat grup sebagai anggota pertama
         $grup->users()->attach($user->id, ['role' => 'admin']);
 
         return redirect()->route('grup.index')->with('success', 'Grup berhasil dibuat!');

@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Catatan;
 use App\Models\Rencana;
-use App\Mail\SendOtpMail; // Pastikan ini diimport
-use Illuminate\Support\Facades\Mail; // Pastikan ini diimport
-use Carbon\Carbon; // Pastikan ini diimport
-use Illuminate\Support\Facades\Hash; // Pastikan ini diimport
+use App\Mail\SendOtpMail; 
+use Illuminate\Support\Facades\Mail; 
+use Carbon\Carbon; 
+use Illuminate\Support\Facades\Hash; 
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Log; // Untuk debugging jika perlu
+use Illuminate\Support\Facades\Log; 
 
 class UserProfileController extends Controller
 {
@@ -140,19 +140,18 @@ class UserProfileController extends Controller
                 !$user->verification_code_expires_at || // Pastikan expiry tidak null
                 Carbon::now()->isAfter($user->verification_code_expires_at))
             {
-                // Hapus OTP jika salah/kadaluarsa (opsional, tapi bagus untuk keamanan)
+                // Hapus OTP jika salah/kadaluarsa 
                  $user->verification_code = null;
                  $user->verification_code_expires_at = null;
                  $user->save();
                 return back()->withErrors(['otp' => 'Kode OTP tidak valid atau telah kedaluwarsa.'])->withInput();
             }
-            // Jika valid, OTP akan dihapus setelah password diupdate
         }
-        // --- Akhir Verifikasi OTP ---
+
 
         $changesMade = false;
 
-        // Logika Update Password (hanya jika password diisi DAN OTP sudah valid/tidak diperlukan)
+        // Logika Update Password
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
             // Hapus OTP setelah berhasil digunakan

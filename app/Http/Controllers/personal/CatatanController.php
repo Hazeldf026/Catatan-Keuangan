@@ -10,16 +10,15 @@ use App\Models\Rencana;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule; // <-- Pastikan ini di-import
-
+use Illuminate\Validation\Rule;
 class CatatanController extends Controller
 {
-    // ... (method index, create, show tidak berubah, biarkan seperti yang ada di file Anda)
+
     public function index(Request $request)
     {
         $userId = Auth::id();
 
-        // --- KALKULASI TOTAL PEMASUKAN & PENGELUARAN (TETAP SAMA) ---
+        // --- KALKULASI TOTAL PEMASUKAN & PENGELUARAN  ---
         $totalPemasukan = Catatan::where('user_id', $userId)->whereHas('category', function($query){
             $query->where('tipe', 'pemasukan');
         })->sum('jumlah');
@@ -55,15 +54,14 @@ class CatatanController extends Controller
 
         $pinnedRencanas = Rencana::where('user_id', $userId)
                             ->where('is_pinned', true)
-                            ->where('status', 'berjalan') // Hanya tampilkan yang masih berjalan
+                            ->where('status', 'berjalan') 
                             ->orderBy('created_at', 'desc')
-                            ->limit(3) // Batasi jumlah yang ditampilkan (opsional)
+                            ->limit(3) 
                             ->get();
 
-        // --- LOGIKA FILTER & SORTING (TETAP SAMA) ---
+        // --- LOGIKA FILTER & SORTING ---
         $categories = Category::orderBy('nama')->get();
         $query = Catatan::with('category')->where('user_id', $userId);
-        // ... (sisa logika filter dan sorting Anda tidak perlu diubah) ...
         if ($request->has('range')) {
             switch ($request->range) {
                 case '3d': $query->whereDate('created_at', '>=', now()->subDays(3)); break;
@@ -120,7 +118,6 @@ class CatatanController extends Controller
         return view('personal::catatan.show', compact('catatan'));
     }
 
-    // --- KODE BARU UNTUK STORE ---
     public function store(Request $request)
     {
         $request->validate([
@@ -134,7 +131,6 @@ class CatatanController extends Controller
                 Rule::in(['rencana', 'media']),
             ],
             'rencana_id' => 'required_if:alokasi,rencana|nullable|exists:rencanas,id',
-            // PERBAIKAN VALIDASI KONDISIONAL
             'media' => [
                 Rule::requiredIf(function () use ($request) {
                     return $request->input('tipe') === 'pengeluaran' || $request->input('alokasi') === 'media';
@@ -178,21 +174,18 @@ class CatatanController extends Controller
         return redirect()->route('catatan.index')->with('success', 'Catatan berhasil ditambahkan!');
     }
 
-    // --- PERBAIKAN PENTING: Method edit() Anda kurang lengkap ---
     public function edit(Catatan $catatan)
     {
         abort_if($catatan->user_id !== Auth::id(), 403);
         
         $categories = Category::orderBy('tipe')->get();
-        // Anda perlu mengirimkan data rencana ke view edit juga
         $rencanas = Rencana::where('user_id', Auth::id())->whereIn('status', ['berjalan', 'selesai'])
-                         ->orWhere('id', $catatan->rencana_id) // Pastikan rencana lama tetap ada di list
-                         ->get();
-                         
+                        ->orWhere('id', $catatan->rencana_id)
+                        ->get();
+                        
         return view('personal::catatan.edit', compact('catatan', 'categories', 'rencanas'));
     }
 
-    // --- KODE BARU UNTUK UPDATE ---
     public function update(Request $request, Catatan $catatan)
     {
         $request->validate([
@@ -267,7 +260,6 @@ class CatatanController extends Controller
         return redirect()->route('catatan.index')->with('success', 'Catatan berhasil diperbarui!');
     }
 
-    // ... (method destroy tidak berubah) ...
     public function destroy(Catatan $catatan)
     {
         DB::transaction(function () use ($catatan) {

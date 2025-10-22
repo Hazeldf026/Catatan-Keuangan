@@ -5,7 +5,6 @@
             Pengaturan Tampilan
         </h2>
 
-        {{-- Alpine scope untuk tema --}}
         <div x-data="{
                 theme: localStorage.getItem('theme') || 'default',
 
@@ -52,7 +51,7 @@
                     <select id="theme_select"
                             x-model="theme"
                             @change="applyTheme($event.target.value)"
-                            class="block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm">
+                            class="block w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white text-gray-700 sm:text-sm">
                         <option value="light">Light</option>
                         <option value="dark">Dark</option>
                         <option value="default">Default Sistem</option>
@@ -62,7 +61,6 @@
                     </p>
                 </div>
 
-                {{-- Preview tema (opsional) --}}
                 <div class="mt-6 p-4 border border-gray-300 dark:border-gray-600 rounded-md">
                     <p class="text-sm text-gray-700 dark:text-gray-300">
                         <strong>Preview:</strong> Tema saat ini - 

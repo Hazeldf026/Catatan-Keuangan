@@ -33,7 +33,7 @@
 <body 
     x-data="{ logoutModalOpen: false }" 
     @open-logout-modal.window="logoutModalOpen = true"
-    class="bg-gray-100 dark:bg-gray-900">
+    class="bg-gray-50 dark:bg-gray-900">
 
     @hasSection('start')
         <div>

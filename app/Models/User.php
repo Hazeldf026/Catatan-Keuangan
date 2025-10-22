@@ -64,7 +64,7 @@ class User extends Authenticatable
     public function grups(): BelongsToMany
     {
         return $this->belongsToMany(Grup::class, 'grup_user')
-                    ->withPivot('role') // Ambil data role
+                    ->withPivot('role')
                     ->withTimestamps();
     }
     

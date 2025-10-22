@@ -37,7 +37,7 @@ class Grup extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function grupCatatans(): HasMany // Atau nama lain yg kamu suka
+    public function grupCatatans(): HasMany 
     {
         return $this->hasMany(GrupCatatan::class);
     }
@@ -49,7 +49,7 @@ class Grup extends Model
 
     public function getUserRole(User $user): ?string 
     {
-        // Pastikan user adalah anggota
+
         $anggota = $this->users()->find($user->id);
         return $anggota ? $anggota->pivot->role : null;
     }

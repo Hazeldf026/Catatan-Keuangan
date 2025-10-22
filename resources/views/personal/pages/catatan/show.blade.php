@@ -1,4 +1,3 @@
-{{-- resources/views/pages/catatan/show.blade.php --}}
 <x-personal::layout>
     <x-slot:title>
         Detail Catatan

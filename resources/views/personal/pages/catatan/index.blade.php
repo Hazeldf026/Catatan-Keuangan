@@ -1,6 +1,6 @@
 <x-personal::layout>
     <x-slot:title>
-        Dashboard Catatan Keuangan | Credix
+        Dashboard | Credix
     </x-slot:title>
 
     <div class="container mx-auto p-4 sm:p-6 lg:p-8">
@@ -10,17 +10,17 @@
             {{-- Kolom Kiri: Kartu Riwayat Transaksi --}}
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                 
-                {{-- BAGIAN 1: Judul dan Tombol Tambah (Desain Baru) --}}
-                <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-700">
+                {{-- Judul dan Tombol Tambah --}}
+                <div class="flex items-center justify-between pb-4 border-b border-gray-300 dark:border-gray-700">
                     <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Riwayat Transaksi</h1>
                     <a href="{{ route('catatan.create') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 whitespace-nowrap">
                         + Tambah
                     </a>
                 </div>
 
-                {{-- BAGIAN 2: Filter Tanggal dan Tombol Filter Modal (Desain Baru) --}}
+                {{-- Filter Tanggal dan Tombol Filter Modal  --}}
                 <div class="flex items-center justify-between my-6">
-                    {{-- Filter Tanggal dengan gaya abu-abu --}}
+                    {{-- Filter Tanggal --}}
                     <div class="flex items-center rounded-lg shadow-sm">
                         <a href="{{ request('range') == '3d' ? route('catatan.index', request()->except('range')) : route('catatan.index', array_merge(request()->except('range', 'page'), ['range' => '3d'])) }}" 
                         class="px-4 py-2 text-sm font-medium border rounded-l-lg {{ request('range') == '3d' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
@@ -44,14 +44,14 @@
                         </a>
                     </div>
                     
-                    {{-- Tombol Filter Modal dengan gaya abu-abu --}}
+                    {{-- Tombol Filter Modal --}}
                     <button type="button" data-modal-target="filter-modal" data-modal-toggle="filter-modal" 
                             class="p-2 text-sm font-medium border rounded-lg bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 focus:ring-blue-500">
                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"></path></svg>
                     </button>
                 </div>  
 
-                {{-- BAGIAN 3: Tabel (STRUKTUR ASLI DIKEMBALIKAN) --}}
+                {{-- Tabel --}}
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -134,7 +134,7 @@
                     </table>
                 </div>
                 
-                {{-- BAGIAN 4: Pagination Kustom --}}
+                {{-- Pagination Kustom --}}
                 <div class="pt-6">
                     {{ $catatans->links() }}
                 </div>
@@ -142,7 +142,7 @@
             
             {{-- Kolom Kanan --}}
             <div class="lg:col-span-1 space-y-8 flex flex-col">
-                {{-- KARTU RINGKASAN KEUANGAN BARU --}}
+                {{-- KARTU RINGKASAN KEUANGAN--}}
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Ringkasan Keuangan</h2>
                     
@@ -189,7 +189,7 @@
                         <div class="bg-purple-50 dark:bg-purple-900/50 p-4 rounded-lg col-span-2">
                             <div class="flex items-center text-purple-600 dark:text-purple-400 mb-1">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                                <h3 class="text-sm font-semibold">Dana di Rencana</h3>
+                                <h3 class="text-sm font-semibold">Total Dana Rencana</h3>
                             </div>
                             <p class="text-lg font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalRencana, 0, ',', '.') }}</p>
                         </div>
@@ -198,7 +198,7 @@
                         <div class="bg-green-50 dark:bg-green-900/50 p-4 rounded-lg">
                             <div class="flex items-center text-green-600 dark:text-green-400 mb-1">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 16v1m0 1v1m0-2.01V16m0-8V6m-6 6h.01M6 12H5m1.01 0H6m6 0h.01M12 12h-1m1.01 0H12m6 0h.01M18 12h-1m1.01 0H18M5 12a7 7 0 1114 0 7 7 0 01-14 0z"></path></svg>
-                                <h3 class="text-sm font-semibold">Pemasukan</h3>
+                                <h3 class="text-xs font-semibold">Total Pemasukan</h3>
                             </div>
                             <p class="text-lg font-bold text-green-600">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</p>
                         </div>
@@ -207,7 +207,7 @@
                         <div class="bg-red-50 dark:bg-red-900/50 p-4 rounded-lg">
                             <div class="flex items-center text-red-600 dark:text-red-400 mb-1">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
-                                <h3 class="text-sm font-semibold">Pengeluaran</h3>
+                                <h3 class="text-xs font-semibold">Total Pengeluaran</h3>
                             </div>
                             <p class="text-lg font-bold text-red-600">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
                         </div>
@@ -216,14 +216,14 @@
                         <div class="bg-blue-50 dark:bg-blue-900/50 p-4 rounded-lg col-span-2">
                             <div class="flex items-center text-blue-600 dark:text-blue-400 mb-1">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.737 11l-.262-2.839a2 2 0 012.24-2.135h4.572a2 2 0 012.24 2.135L16.263 11M9 11V5.5A2.5 2.5 0 0111.5 3h1A2.5 2.5 0 0115 5.5V11"></path></svg>
-                                <h3 class="text-sm font-semibold">Total Saldo Tersedia</h3>
+                                <h3 class="text-sm font-semibold">Total Saldo</h3>
                             </div>
                             <p class="text-xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($saldoAkhir, 0, ',', '.') }}</p>
                         </div>
                     </div>
                 </div>
                 
-                {{-- KARTU RENCANA PRIORITAS BARU --}}
+                {{-- KARTU RENCANA PRIORITAS --}}
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Rencana Prioritas</h2>
                     

@@ -18,12 +18,10 @@ class GrupCatatan extends Model
         'deskripsi',
         'jumlah',
         'alokasi',
-        // 'grup_rencana_id', // Aktifkan nanti
         'media',
     ];
 
-    // Load relasi category secara default (mirip Catatan personal)
-    protected $with = ['category', 'user']; // Tambahkan 'user' untuk tahu siapa pencatat
+    protected $with = ['category', 'user']; 
 
     /**
      * Relasi ke Grup.

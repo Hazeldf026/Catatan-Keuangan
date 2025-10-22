@@ -4,12 +4,11 @@
     </x-slot:title>
 
     <div class="container mx-auto p-4 sm:p-6 lg:p-8">
-        {{-- KARTU UTAMA DENGAN BACKGROUND PUTIH SEPERTI HALAMAN LAIN --}}
         <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
 
-            {{-- HEADER: Judul, Tombol Tambah, DAN GARIS PEMBATAS --}}
+            {{-- Judul, Tombol Tambah, dan garis pembatas --}}
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
-                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">Rencana Keuangan Saya</h1>
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-0">Rencana Keuangan</h1>
                 <a href="{{ route('rencana.create') }}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 whitespace-nowrap">
                     + Tambah Rencana
                 </a>
@@ -18,27 +17,27 @@
             {{-- KONTROL FILTER DAN SORTING --}}
             <div class="flex justify-between items-center mb-6">
                 
-                {{-- Filter Status dengan background abu-abu seperti di gambar --}}
+                {{-- Filter Status --}}
                 <div class="flex items-center rounded-lg shadow-sm">
                     <a href="{{ route('rencana.index', array_merge(request()->except('page', 'status'))) }}" 
-                       class="px-4 py-2 text-sm font-medium border rounded-l-lg {{ !request('status') ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                    class="px-4 py-2 text-sm font-medium border rounded-l-lg {{ !request('status') ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                         Semua
                     </a>
                     <a href="{{ route('rencana.index', array_merge(request()->except('page'), ['status' => 'berjalan'])) }}" 
-                       class="px-4 py-2 -ml-px text-sm font-medium border {{ request('status') == 'berjalan' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                    class="px-4 py-2 -ml-px text-sm font-medium border {{ request('status') == 'berjalan' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                         Berjalan
                     </a>
                     <a href="{{ route('rencana.index', array_merge(request()->except('page'), ['status' => 'selesai'])) }}" 
-                       class="px-4 py-2 -ml-px text-sm font-medium border {{ request('status') == 'selesai' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                    class="px-4 py-2 -ml-px text-sm font-medium border {{ request('status') == 'selesai' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                         Selesai
                     </a>
                     <a href="{{ route('rencana.index', array_merge(request()->except('page'), ['status' => 'dibatalkan'])) }}" 
-                       class="px-4 py-2 -ml-px text-sm font-medium border rounded-r-lg {{ request('status') == 'dibatalkan' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
+                    class="px-4 py-2 -ml-px text-sm font-medium border rounded-r-lg {{ request('status') == 'dibatalkan' ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600' }}">
                         Dibatalkan
                     </a>
                 </div>
 
-                {{-- Dropdown Urutkan HANYA DENGAN IKON --}}
+                {{-- Dropdown Urutkan --}}
                 <div x-data="{ open: false }" class="relative">
                     <button @click="open = !open" class="p-2 text-sm font-medium border rounded-lg bg-gray-100 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800 focus:ring-blue-500">
                         <span class="sr-only">Buka menu urutkan</span>
@@ -70,7 +69,6 @@
             @else
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($rencanas as $rencana)
-                        {{-- Kartu Rencana Individual dengan background abu-abu --}}
                         <a href="{{ route('rencana.show', $rencana) }}" 
                             class="relative group block p-5 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm hover:ring-2 hover:ring-blue-500 transition-all duration-200 {{ $rencana->status === 'dibatalkan' ? 'opacity-60' : '' }}">
                             
@@ -106,7 +104,6 @@
                                 <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-600">
                                     @php
                                         $raw_progress = ($rencana->target_jumlah > 0) ? ($rencana->jumlah_terkumpul / $rencana->target_jumlah) * 100 : 0;
-                                        // Gunakan min() untuk membatasi nilai yang akan ditampilkan
                                         $progress_display = min($raw_progress, 100);
                                     @endphp
                                     <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ $progress_display }}%"></div>
@@ -114,7 +111,6 @@
 
                                 <div class="flex justify-between items-baseline text-xs">
                                     <span class="text-gray-500 dark:text-gray-400">Target: Rp {{ number_format($rencana->target_jumlah, 0, ',', '.') }}</span>
-                                    {{-- FINAL: Tampilkan nilai yang sudah dibatasi --}}
                                     <span class="font-bold text-gray-800 dark:text-gray-200">{{ round($progress_display) }}%</span>
                                 </div>
                             </div>

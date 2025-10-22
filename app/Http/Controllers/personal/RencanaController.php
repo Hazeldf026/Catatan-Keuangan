@@ -20,12 +20,12 @@ class RencanaController extends Controller
                     ->orderBy('is_pinned', 'desc') 
                     ->orderBy('created_at', 'desc');
 
-        // 1. Logika untuk FILTER berdasarkan status
+        // Logika untuk FILTER berdasarkan status
         if ($request->has('status') && in_array($request->status, ['berjalan', 'selesai', 'dibatalkan'])) {
             $query->where('status', $request->status);
         }
 
-        // 2. Logika untuk SORTING (Pengurutan)
+        // Logika untuk SORTING (Pengurutan)
         $sortBy = $request->get('sort_by', 'created_at'); // Default: urutkan berdasarkan terbaru
         $order = $request->get('order', 'desc');
 
@@ -34,12 +34,9 @@ class RencanaController extends Controller
                 $query->orderBy('target_jumlah', $order);
                 break;
             case 'progress':
-                // Mengurutkan berdasarkan persentase progress (perhitungan matematis)
-                // Pastikan tidak ada pembagian dengan nol jika target_jumlah adalah 0
                 $query->orderBy(DB::raw('CASE WHEN target_jumlah > 0 THEN (jumlah_terkumpul / target_jumlah) ELSE 0 END'), $order);
                 break;
             case 'date':
-                // Mengurutkan berdasarkan tanggal, null akan ditaruh di akhir
                 $query->orderByRaw('target_tanggal IS NULL, target_tanggal ' . $order);
                 break;
             default:
@@ -47,10 +44,8 @@ class RencanaController extends Controller
                 break;
         }
 
-        // Ambil data dengan paginasi dan pertahankan parameter query string saat pindah halaman
         $rencanas = $query->paginate(9)->withQueryString();
 
-        // Kirim data ke view
         return view('personal::rencana.index', compact('rencanas'));
     }
 
@@ -59,7 +54,6 @@ class RencanaController extends Controller
      */
     public function create()
     {
-        // Tampilkan halaman form untuk membuat rencana baru
         return view('personal::rencana.create');
     }
 

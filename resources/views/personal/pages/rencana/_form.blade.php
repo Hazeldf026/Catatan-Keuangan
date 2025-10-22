@@ -17,7 +17,6 @@
             @error('nama') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
         </div>
 
-        {{-- PERBAIKAN: Menggunakan `target_jumlah` di semua bagian --}}
         <div>
             <label for="target_jumlah_display" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Target Jumlah (Rp)</label>
             <input type="text" id="target_jumlah_display" value="{{ old('target_jumlah', isset($rencana->target_jumlah) ? number_format($rencana->target_jumlah, 0, ',', '.') : '') }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" placeholder="Contoh: 5.000.000" required>
@@ -100,7 +99,6 @@
     </div>
 </form>
 
-{{-- PERBAIKAN: Menargetkan ID yang benar --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const jumlahDisplay = document.getElementById('target_jumlah_display');
