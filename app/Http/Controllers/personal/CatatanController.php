@@ -29,7 +29,7 @@ class CatatanController extends Controller
 
         $saldoAkhir = $totalPemasukan - $totalPengeluaran;
 
-        // --- KALKULASI BARU UNTUK SETIAP MEDIA ---
+        // --- KALKULASI UNTUK SETIAP MEDIA ---
         $calculateMediaBalance = function($media) use ($userId) {
             $pemasukan = Catatan::where('user_id', $userId)
                                 ->where('media', $media)
@@ -49,7 +49,7 @@ class CatatanController extends Controller
         $totalEWallet = $calculateMediaBalance('e-wallet');
         $totalTabungan = $calculateMediaBalance('tabungan');
 
-        // --- KALKULASI BARU UNTUK TOTAL RENCANA ---
+        // --- KALKULASI UNTUK TOTAL RENCANA ---
         $totalRencana = Rencana::where('user_id', $userId)->sum('jumlah_terkumpul');
 
         $pinnedRencanas = Rencana::where('user_id', $userId)
@@ -80,6 +80,12 @@ class CatatanController extends Controller
             $categoryIds = Category::whereIn('nama', $request->kategori)->pluck('id');
             $query->whereIn('category_id', $categoryIds);
         }
+        if ($request->filled('media') && is_array($request->media)) {
+            $query->whereIn('media', $request->media);
+        }
+        if ($request->input('alokasi_rencana') == 'true') {
+            $query->whereNotNull('rencana_id'); 
+        }
         $sortBy = $request->get('sort_by', 'created_at');
         $order = $request->get('order', 'desc');
         if ($sortBy == 'tanggal') {
@@ -102,7 +108,7 @@ class CatatanController extends Controller
             'totalEWallet',
             'totalTabungan',
             'totalRencana',
-            'pinnedRencanas'
+            'pinnedRencanas',
         ));
     }
 

@@ -153,7 +153,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                                 <h3 class="text-sm font-semibold">Wallet</h3>
                             </div>
-                            <p class="text-lg font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalWallet, 0, ',', '.') }}</p>
+                            <p class="text-lg font-bold text-orange-600 dark:text-orange-400">Rp {{ number_format($totalWallet, 0, ',', '.') }}</p>
                         </div>
 
                         {{-- Total Bank --}}
@@ -162,7 +162,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                                 <h3 class="text-sm font-semibold">Bank</h3>
                             </div>
-                            <p class="text-lg font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalBank, 0, ',', '.') }}</p>
+                            <p class="text-lg font-bold text-indigo-600 dark:text-indigo-400">Rp {{ number_format($totalBank, 0, ',', '.') }}</p>
                         </div>
 
                         {{-- Total E-Wallet --}}
@@ -171,7 +171,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                                 <h3 class="text-sm font-semibold">E-Wallet</h3>
                             </div>
-                            <p class="text-lg font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalEWallet, 0, ',', '.') }}</p>
+                            <p class="text-lg font-bold text-sky-600 dark:text-sky-400">Rp {{ number_format($totalEWallet, 0, ',', '.') }}</p>
                         </div>
 
                         {{-- Total Tabungan --}}
@@ -180,7 +180,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v6z"></path></svg>
                                 <h3 class="text-sm font-semibold">Tabungan</h3>
                             </div>
-                            <p class="text-lg font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalTabungan, 0, ',', '.') }}</p>
+                            <p class="text-lg font-bold text-amber-600 dark:text-amber-400">Rp {{ number_format($totalTabungan, 0, ',', '.') }}</p>
                         </div>
                     </div>
 
@@ -191,7 +191,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                                 <h3 class="text-sm font-semibold">Total Dana Rencana</h3>
                             </div>
-                            <p class="text-lg font-bold text-gray-900 dark:text-white">Rp {{ number_format($totalRencana, 0, ',', '.') }}</p>
+                            <p class="text-lg font-bold text-purple-600 dark:text-purple-400">Rp {{ number_format($totalRencana, 0, ',', '.') }}</p>
                         </div>
 
                         {{-- Total Pemasukan --}}
@@ -200,7 +200,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1m0-1V4m0 2.01M12 16v1m0 1v1m0-2.01V16m0-8V6m-6 6h.01M6 12H5m1.01 0H6m6 0h.01M12 12h-1m1.01 0H12m6 0h.01M18 12h-1m1.01 0H18M5 12a7 7 0 1114 0 7 7 0 01-14 0z"></path></svg>
                                 <h3 class="text-xs font-semibold">Total Pemasukan</h3>
                             </div>
-                            <p class="text-lg font-bold text-green-600">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</p>
+                            <p class="text-lg font-bold text-green-600 dark:text-green-400">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</p>
                         </div>
 
                         {{-- Total Pengeluaran --}}
@@ -209,7 +209,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
                                 <h3 class="text-xs font-semibold">Total Pengeluaran</h3>
                             </div>
-                            <p class="text-lg font-bold text-red-600">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
+                            <p class="text-lg font-bold text-red-600 dark:text-red-400">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</p>
                         </div>
 
                         {{-- Total Saldo --}}
@@ -218,7 +218,7 @@
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.737 11l-.262-2.839a2 2 0 012.24-2.135h4.572a2 2 0 012.24 2.135L16.263 11M9 11V5.5A2.5 2.5 0 0111.5 3h1A2.5 2.5 0 0115 5.5V11"></path></svg>
                                 <h3 class="text-sm font-semibold">Total Saldo</h3>
                             </div>
-                            <p class="text-xl font-bold text-gray-900 dark:text-white">Rp {{ number_format($saldoAkhir, 0, ',', '.') }}</p>
+                            <p class="text-xl font-bold text-blue-600 dark:text-blue-400">Rp {{ number_format($saldoAkhir, 0, ',', '.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -265,5 +265,70 @@
     </div>
     
     {{-- Modal Filter --}}
-    <div id="filter-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full"> <div class="relative p-4 w-full max-w-md h-full md:h-auto"> <div class="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5"> <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600"> <h3 class="text-lg font-semibold text-gray-900 dark:text-white"> Filter Transaksi </h3> <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="filter-modal"> <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg> <span class="sr-only">Close modal</span> </button> </div> <form action="{{ route('catatan.index') }}" method="GET"> @if(request('sort_by')) <input type="hidden" name="sort_by" value="{{ request('sort_by') }}"> <input type="hidden" name="order" value="{{ request('order') }}"> @endif <h4 class="mb-2 font-semibold text-gray-900 dark:text-white">Tipe Transaksi</h4> <ul class="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4"> <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600"><div class="flex items-center ps-3"><input id="all-type" type="radio" value="" name="tipe" class="w-4 h-4 text-blue-600" {{ !request('tipe') ? 'checked' : '' }}><label for="all-type" class="w-full py-3 ms-2">Semua</label></div></li> <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600"><div class="flex items-center ps-3"><input id="pemasukan" type="radio" value="pemasukan" name="tipe" class="w-4 h-4 text-blue-600" {{ request('tipe') == 'pemasukan' ? 'checked' : '' }}><label for="pemasukan" class="w-full py-3 ms-2">Pemasukan</label></div></li> <li class="w-full dark:border-gray-600"><div class="flex items-center ps-3"><input id="pengeluaran" type="radio" value="pengeluaran" name="tipe" class="w-4 h-4 text-blue-600" {{ request('tipe') == 'pengeluaran' ? 'checked' : '' }}><label for="pengeluaran" class="w-full py-3 ms-2">Pengeluaran</label></div></li> </ul> <h4 class="mb-2 font-semibold text-gray-900 dark:text-white">Kategori</h4> <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg dark:border-gray-600"> @foreach ($categories as $category) <div class="flex items-center"> <input id="cat-{{ $category->id }}" name="kategori[]" type="checkbox" value="{{ $category->nama }}" class="w-4 h-4 text-blue-600 rounded" {{ in_array($category->nama, request('kategori', [])) ? 'checked' : '' }}> <label for="cat-{{ $category->id }}" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $category->nama }}</label> </div> @endforeach </div> <div class="flex items-center justify-end space-x-4 mt-6"> <a href="{{ route('catatan.index') }}" class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"> Reset Filter </a> <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"> Terapkan Filter </button> </div> </form> </div> </div> </div>
+    <div id="filter-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
+        <div class="relative p-4 w-full max-w-md h-full md:h-auto">
+            <div class="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
+                <div class="flex justify-between items-center pb-4 mb-4 rounded-t border-b sm:mb-5 dark:border-gray-600">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white"> Filter Transaksi </h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="filter-modal">
+                        <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        <span class="sr-only">Close modal</span>
+                    </button>
+                </div>
+                <form action="{{ route('catatan.index') }}" method="GET">
+                    @if(request('sort_by'))
+                        <input type="hidden" name="sort_by" value="{{ request('sort_by') }}">
+                        <input type="hidden" name="order" value="{{ request('order') }}">
+                    @endif
+
+                    <h4 class="mb-2 font-semibold text-gray-900 dark:text-white">Tipe Transaksi</h4>
+                    <ul class="items-center w-full text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg sm:flex dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4">
+                        <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600"><div class="flex items-center ps-3"><input id="all-type" type="radio" value="" name="tipe" class="w-4 h-4 text-blue-600" {{ !request('tipe') ? 'checked' : '' }}><label for="all-type" class="w-full py-3 ms-2">Semua</label></div></li>
+                        <li class="w-full border-b border-gray-200 sm:border-b-0 sm:border-r dark:border-gray-600"><div class="flex items-center ps-3"><input id="pemasukan" type="radio" value="pemasukan" name="tipe" class="w-4 h-4 text-blue-600" {{ request('tipe') == 'pemasukan' ? 'checked' : '' }}><label for="pemasukan" class="w-full py-3 ms-2">Pemasukan</label></div></li>
+                        <li class="w-full dark:border-gray-600"><div class="flex items-center ps-3"><input id="pengeluaran" type="radio" value="pengeluaran" name="tipe" class="w-4 h-4 text-blue-600" {{ request('tipe') == 'pengeluaran' ? 'checked' : '' }}><label for="pengeluaran" class="w-full py-3 ms-2">Pengeluaran</label></div></li>
+                    </ul>
+
+                    <h4 class="mb-2 font-semibold text-gray-900 dark:text-white">Kategori</h4>
+                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border rounded-lg dark:border-gray-600">
+                        @foreach ($categories as $category)
+                            <div class="flex items-center">
+                                <input id="cat-{{ $category->id }}" name="kategori[]" type="checkbox" value="{{ $category->nama }}" class="w-4 h-4 text-blue-600 rounded" {{ in_array($category->nama, request('kategori', [])) ? 'checked' : '' }}>
+                                <label for="cat-{{ $category->id }}" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ $category->nama }}</label>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <h4 class="mt-4 mb-2 font-semibold text-gray-900 dark:text-white">Alokasi</h4>
+                    <div class="p-3 border rounded-lg dark:border-gray-600 space-y-3">
+                        
+                        <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Media</label>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            @php $mediaOptions = ['wallet', 'bank', 'e-wallet', 'tabungan']; @endphp
+                            @foreach ($mediaOptions as $media)
+                                <div class="flex items-center">
+                                    <input id="media-{{ $media }}" name="media[]" type="checkbox" value="{{ $media }}" class="w-4 h-4 text-blue-600 rounded" {{ in_array($media, request('media', [])) ? 'checked' : '' }}>
+                                    <label for="media-{{ $media }}" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{ ucfirst($media) }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <hr class="border-gray-200 dark:border-gray-500 my-2">
+
+                        <label class="text-sm font-medium text-gray-900 dark:text-gray-300">Rencana</label>
+                        
+                        <div class="flex items-center pt-1">
+                            <input id="alokasi_rencana" name="alokasi_rencana" type="checkbox" value="true" class="w-4 h-4 text-blue-600 rounded" {{ request('alokasi_rencana') == 'true' ? 'checked' : '' }}>
+                            <label for="alokasi_rencana" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Rencana</label>
+                        </div>
+
+                    </div>
+                    <div class="flex items-center justify-end space-x-4 mt-6">
+                        <a href="{{ route('catatan.index') }}" class="text-red-600 inline-flex items-center hover:text-white border border-red-600 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"> Reset Filter </a>
+                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"> Terapkan Filter </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </x-personal::layout>
