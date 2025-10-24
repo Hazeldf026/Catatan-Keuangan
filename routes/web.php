@@ -72,16 +72,24 @@ Route::middleware('auth')->group(function () {
     Route::get('grup/find', [GrupController::class, 'findGrupByCode'])->name('grup.find');
     Route::post('grup/join', [GrupController::class, 'join'])->name('grup.join');
 
-    Route::get('/profil', [UserProfileController::class, 'profile'])->name('profile.index');
+    Route::get('/profile', [UserProfileController::class, 'profile'])->name('profile.index');
+    Route::get('/profile/data', [UserProfileController::class, 'getProfileData'])->name('profile.data');
 
-    Route::prefix('pengaturan')->name('settings.')->group(function() {
+    Route::prefix('settings')->name('settings.')->group(function() {
         // Pengaturan Akun
-        Route::get('/akun', [UserProfileController::class, 'account'])->name('account.index');
-        Route::put('/akun', [UserProfileController::class, 'updateAccount'])->name('account.update'); // Update via PUT/PATCH
-        Route::post('/akun/send-otp', [UserProfileController::class, 'sendAccountOtp'])->name('account.send_otp'); // Kirim OTP
+        Route::get('/account', [UserProfileController::class, 'account'])->name('account.index');
+
+        Route::post('/account/email', [UserProfileController::class, 'updateEmail'])->name('account.updateEmail');
+        // Route untuk update Password
+        Route::post('/account/password', [UserProfileController::class, 'updatePassword'])->name('account.updatePassword');
+        // Route untuk MENGIRIM / MENGIRIM ULANG OTP
+        Route::post('/account/send-otp', [UserProfileController::class, 'sendEmailVerificationOtp'])->name('account.sendEmailOtp');
+        Route::post('/account/resend-otp', [UserProfileController::class, 'resendEmailOtp'])->name('account.resendEmailOtp');
+        // Route untuk MEMVERIFIKASI OTP
+        Route::post('/account/verify-email', [UserProfileController::class, 'verifyEmail'])->name('account.verifyEmail');
 
         // Pengaturan Tampilan
-        Route::get('/tampilan', [UserProfileController::class, 'appearance'])->name('appearance.index');
+        Route::get('/appearance', [UserProfileController::class, 'appearance'])->name('appearance.index');
         // Route::put('/tampilan', [UserProfileController::class, 'updateAppearance'])->name('appearance.update'); // Jika perlu simpan ke backend
     });
 

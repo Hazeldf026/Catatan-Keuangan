@@ -1,10 +1,10 @@
 <div x-show="logoutModalOpen" 
     x-cloak 
     {{-- 1. Tambahkan x-data & x-init untuk mengelola hitung mundur --}}
-    x-data="{ countdown: 5, isCountingDown: true, timer: null,
+    x-data="{ countdown: 3, isCountingDown: true, timer: null,
         startCountdown() {
             this.isCountingDown = true;
-            this.countdown = 5;
+            this.countdown = 3;
             this.timer = setInterval(() => {
                 this.countdown--;
                 if (this.countdown <= 0) {
@@ -16,7 +16,7 @@
         stopCountdown() {
             clearInterval(this.timer);
             this.isCountingDown = true;
-            this.countdown = 5;
+            this.countdown = 3;
         }
     }"
     x-init="$watch('logoutModalOpen', value => {
