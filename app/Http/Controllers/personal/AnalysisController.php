@@ -4,6 +4,7 @@ namespace App\Http\Controllers\personal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catatan;
+use App\Models\Rencana;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,7 +57,15 @@ class AnalysisController extends Controller
             )
             ->orderBy('total', 'desc')
             ->get();
-        
+
+        $mediaMap = $mediaBalances->pluck('total', 'media');
+        $walletLifetime = $mediaMap->get('wallet');
+        $bankLifetime = $mediaMap->get('bank');
+        $ewalletLifetime = $mediaMap->get('e-wallet');
+        $tabunganLifetime = $mediaMap->get('tabungan');
+
+        $totalRencana = Rencana::where('user_id', $userId)->sum('jumlah_terkumpul');
+
         $mediaPieChartLabels = $mediaBalances->pluck('media');
         
         $mediaPieChartData = $mediaBalances->map(fn ($item) => $item->total > 0 ? $item->total : 0);
@@ -85,6 +94,11 @@ class AnalysisController extends Controller
                     'totalPemasukan' => number_format($totalPemasukanLifetime, 0, ',', '.'),
                     'totalPengeluaran' => number_format($totalPengeluaranLifetime, 0, ',', '.'),
                     'saldo' => number_format($totalPemasukanLifetime - $totalPengeluaranLifetime, 0, ',', '.'),
+                    'wallet' => number_format($walletLifetime, 0, ',', '.'),
+                    'bank' => number_format($bankLifetime, 0, ',', '.'),
+                    'ewallet' => number_format($ewalletLifetime, 0, ',', '.'),
+                    'tabungan' => number_format($tabunganLifetime, 0, ',', '.'),
+                    'totalRencana' => number_format($totalRencana, 0, ',', '.'),
                 ],
                 'pieChart' => [
                     'pemasukan' => $totalPemasukanLifetime,

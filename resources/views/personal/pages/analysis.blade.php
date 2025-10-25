@@ -11,8 +11,33 @@
         x-init="initCharts()"
         class="container mx-auto p-4 sm:p-6 lg:p-8">
 
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            {{-- Wallet --}}
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
+                <div class="bg-orange-100 dark:bg-orange-900 p-3 rounded-full">
+                    <svg class="w-6 h-6 text-orange-600 dark:text-orange-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                </div>
+                <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Wallet</h4><p id="summary-wallet" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
+            </div>
+            {{-- Bank --}}
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
+                <div class="bg-indigo-100 dark:bg-indigo-900 p-3 rounded-full"><svg class="w-6 h-6 text-indigo-600 dark:text-indigo-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></div>
+                <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Bank</h4><p id="summary-bank" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
+            </div>
+            {{-- E-Wallet --}}
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
+                <div class="bg-sky-100 dark:bg-sky-900 p-3 rounded-full"><svg class="w-6 h-6 text-sky-600 dark:text-sky-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg></div>
+                <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">E-Wallet</h4><p id="summary-e-wallet" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
+            </div>
+            {{-- Tabungan --}}
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
+                <div class="bg-amber-100 dark:bg-amber-900 p-3 rounded-full"><svg class="w-6 h-6 text-amber-600 dark:text-amber-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v6z"></path></svg></div>
+                <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Tabungan</h4><p id="summary-tabungan" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
+            </div>
+        </div>
+
         {{-- Kartu Ringkasan --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
                 <div class="bg-green-100 dark:bg-green-900 p-3 rounded-full"><svg class="w-6 h-6 text-green-600 dark:text-green-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1M2 5h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg></div>
                 <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Pemasukan</h4><p id="summary-pemasukan" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
@@ -21,12 +46,20 @@
                 <div class="bg-red-100 dark:bg-red-900 p-3 rounded-full"><svg class="w-6 h-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
                 <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Pengeluaran</h4><p id="summary-pengeluaran" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
             </div>
+        </div>
+
+        {{-- Kartu Total Rencana --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
+                <div class="bg-purple-100 dark:bg-purple-900 p-3 rounded-full"><svg class="w-6 h-6 text-purple-600 dark:text-purple-300" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div>
+                <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Dana Rencana</h4><p id="summary-rencana" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
+            </div>
             <div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-md flex items-center space-x-4">
                 <div class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full"><svg class="w-6 h-6 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
                 <div><h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Saldo</h4><p id="summary-saldo" class="text-xl font-bold text-gray-900 dark:text-white">Memuat...</p></div>
             </div>
         </div>
-        
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
             {{-- Line Chart --}}
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
@@ -166,6 +199,11 @@
                             document.getElementById('summary-pemasukan').textContent = 'Memuat...';
                             document.getElementById('summary-pengeluaran').textContent = 'Memuat...';
                             document.getElementById('summary-saldo').textContent = 'Memuat...';
+                            document.getElementById('summary-wallet').textContent = 'Memuat...';
+                            document.getElementById('summary-bank').textContent = 'Memuat...';
+                            document.getElementById('summary-e-wallet').textContent = 'Memuat...';
+                            document.getElementById('summary-tabungan').textContent = 'Memuat...';
+                            document.getElementById('summary-rencana').textContent = 'Memuat...';
                             analysisContainer.innerHTML = '<div class="text-center text-gray-500 dark:text-gray-400">Memuat data analisis...</div>';
                         }
                         
@@ -178,6 +216,12 @@
                             document.getElementById('summary-pemasukan').textContent = 'Rp ' + lifetime.summary.totalPemasukan;
                             document.getElementById('summary-pengeluaran').textContent = 'Rp ' + lifetime.summary.totalPengeluaran;
                             document.getElementById('summary-saldo').textContent = 'Rp ' + lifetime.summary.saldo;
+                            document.getElementById('summary-wallet').textContent = 'Rp ' + lifetime.summary.wallet;
+                            document.getElementById('summary-bank').textContent = 'Rp ' + lifetime.summary.bank;
+                            document.getElementById('summary-e-wallet').textContent = 'Rp ' + lifetime.summary.ewallet;
+                            document.getElementById('summary-tabungan').textContent = 'Rp ' + lifetime.summary.tabungan;
+                            document.getElementById('summary-rencana').textContent = 'Rp ' + lifetime.summary.totalRencana;
+
                             
                             pieChart.data.datasets[0].data = [lifetime.pieChart.pemasukan, lifetime.pieChart.pengeluaran];
                             pieChart.update();

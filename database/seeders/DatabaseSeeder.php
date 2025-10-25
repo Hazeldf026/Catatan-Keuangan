@@ -53,10 +53,10 @@ class DatabaseSeeder extends Seeder
                 // -----------------------------------------------------------------
                 
                 // Tentukan Total Pemasukan Awal (misal 500jt)
-                $totalTargetPemasukan = 200_000_000;
+                $totalTargetPemasukan = 400_000_000;
                 
                 // Tentukan Total Pengeluaran (30-40% dari Pemasukan, misal kita pakai 40%)
-                $totalTargetPengeluaran = $totalTargetPemasukan * 0.40; // 200,000,000
+                $totalTargetPengeluaran = $totalTargetPemasukan * 0.30; // 200,000,000
                 
                 // Tentukan Saldo Akhir (sebelum alokasi Rencana)
                 $targetSaldoAkhir = $totalTargetPemasukan - $totalTargetPengeluaran; // 300,000,000
