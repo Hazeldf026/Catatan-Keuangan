@@ -1,7 +1,4 @@
-<x-personal::layout>
-    <x-slot:title>
-        Analisis | Credix
-    </x-slot:title>
+<x-personal::layout :title="'Analisis'">
 
     <div 
         x-data="analysisPage(

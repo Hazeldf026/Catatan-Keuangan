@@ -7,6 +7,9 @@
     @vite('resources/css/app.css')
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.15.0/dist/cdn.min.js"></script>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 <body>
 
@@ -15,6 +18,6 @@
         </div>
 
 
-    {{-- <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 </body>
 </html>

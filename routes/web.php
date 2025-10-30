@@ -97,6 +97,10 @@ Route::middleware('auth')->group(function () {
         ->name('group.') // Nama route diawali 'grup.' (cth: grup.catatan.index)
         ->group(function () {
 
+            Route::get('/', function () {
+                return redirect()->route('group.catatan.index');
+            });
+
             Route::resource('catatan', CatatanGroupController::class);
 
             Route::resource('rencana', RencanaGroupController::class);
